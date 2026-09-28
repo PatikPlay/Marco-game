@@ -338,21 +338,7 @@
         #gabriel-helper-speech.speech-enter { animation: gabrielSpeechIn 0.45s cubic-bezier(0.34,1.56,0.64,1) forwards; }
         #gabriel-helper-speech.speech-exit  { animation: gabrielSpeechOut 0.5s ease-in forwards; }
         
-        /* Menú principal en landscape */
-        .menu-title { margin-top: 2rem; margin-bottom: 2rem; }
-        .menu-subtitle { margin-bottom: 1.5rem; }
-        .menu-records { margin-bottom: 1.5rem; }
-
         @media (max-height: 500px) and (orientation: landscape) {
-            #main-menu { justify-content: flex-start; padding-top: 0.5rem; padding-bottom: 4rem; }
-            .menu-title { font-size: 1.4rem !important; margin-top: 0.25rem; margin-bottom: 0.25rem; }
-            .menu-subtitle { margin-bottom: 0.25rem; }
-            .menu-records { margin-bottom: 0.5rem; padding: 0.5rem 0.75rem; }
-            .menu-records h3 { margin-bottom: 0.25rem; }
-            .menu-records ol { max-height: 4rem; overflow-y: auto; }
-            #main-menu .menu-btns { gap: 0.5rem; flex-direction: row !important; }
-            #main-menu #btn-start, #main-menu #btn-shop { padding: 0.5rem 1rem; font-size: 0.65rem; }
-            #main-menu #btn-edit-name, #main-menu #btn-study-select { padding: 0.35rem 0.6rem; }
 
             /* Pantalla de "CAÍDO" / Reintentar: en horizontal con poca altura no había
                overflow-y, así que el contenido (título + mensaje + distancia + top récords
@@ -378,20 +364,11 @@
             #boss-ui #boss-tip { display: none; }
             #boss-ui .h-4 { height: 0.6rem !important; }
 
-            /* Cuartel General (tienda): el contenedor exterior no tenía overflow-y, así
-               que si el título + cristales + botón de anuncio + pestañas + rejilla de
-               skins sumaban más altura que la pantalla, el botón "Volver al Menú" del
-               final quedaba fuera de la vista sin poder llegar a él. Se reduce cada
-               bloque y se añade scroll como red de seguridad. */
-            #shop-menu { overflow-y: auto; padding-top: 0.5rem; padding-bottom: 0.5rem; justify-content: flex-start; }
-            #shop-menu #hq-title { font-size: 1rem !important; margin-bottom: 0.25rem; }
-            #shop-menu .rounded-full { padding: 0.25rem 0.75rem !important; margin-bottom: 0.4rem !important; }
-            #shop-menu #ad-section { margin-bottom: 0.4rem !important; }
+            /* Cuartel General: con poca altura se compacta la cabecera (el botón de volver
+               está siempre arriba, fijo, así que ya nunca se queda fuera de la vista). */
+            #shop-menu .shop-header { padding-top: 6px; padding-bottom: 6px; }
+            #shop-menu #hq-title { font-size: 0.8rem !important; }
             #shop-menu #ad-web-block > div { padding: 0.4rem 0.75rem !important; }
-            #shop-menu .gap-4.mb-6 { margin-bottom: 0.5rem !important; gap: 0.5rem !important; }
-            #shop-menu #tab-skins, #shop-menu #tab-skills { padding: 0.4rem 0.75rem !important; }
-            #shop-menu #skins-container, #shop-menu #skills-container { max-height: 40vh !important; gap: 0.5rem !important; }
-            #shop-menu #btn-close-shop { margin-top: 0.5rem !important; padding: 0.5rem 1.5rem !important; }
 
             /* Configuración de controles: la lista de teclas asignables (una fila por
                habilidad) puede sumar más alto que la pantalla entera. Ya tenía scroll
@@ -402,10 +379,279 @@
             #controls-modal .border-t { padding-top: 0.5rem !important; }
         }
 
+
+        /* ============================================================
+           HUB — MENÚ PRINCIPAL, CUARTEL GENERAL, PAUSA Y DERROTA
+           ============================================================ */
+        :root {
+            --hub-ink: #050011;
+            --hub-panel: rgba(12, 6, 30, 0.78);
+            --hub-line: rgba(168, 85, 247, 0.28);
+            --hub-soft: rgba(255, 255, 255, 0.06);
+            --hub-gold: #facc15;
+        }
+        /* Mientras se ve el menú o la tienda, el HUD de partida no pinta nada debajo */
+        body.in-hub #hud-top, body.in-hub #hud-skills, body.in-hub #mobile-controls { visibility: hidden; }
+
+        #main-menu { overflow-y: auto; overflow-x: hidden; text-align: left; }
+        .hub-bg {
+            position: absolute; inset: 0; pointer-events: none;
+            background:
+                radial-gradient(ellipse 30% 42% at 50% 62%, rgba(250, 204, 21, 0.10) 0%, rgba(5, 0, 17, 0) 60%),
+                linear-gradient(90deg, rgba(5,0,17,.94) 0%, rgba(5,0,17,.72) 26%, rgba(5,0,17,.10) 42%, rgba(5,0,17,.10) 58%, rgba(5,0,17,.72) 74%, rgba(5,0,17,.94) 100%),
+                linear-gradient(180deg, rgba(5,0,17,.55) 0%, rgba(5,0,17,0) 22%, rgba(5,0,17,0) 70%, rgba(5,0,17,.75) 100%);
+        }
+        .hub-inner {
+            position: relative; min-height: 100%; width: 100%; max-width: 1440px; margin: 0 auto;
+            display: flex; flex-direction: column; padding: 16px 20px 20px; gap: 12px;
+            animation: hubIn .35s ease-out both;
+        }
+        @keyframes hubIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        .hub-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .hub-top-right { display: flex; align-items: center; gap: 8px; }
+        .hub-main {
+            flex: 1; display: grid; gap: 28px; align-items: center;
+            grid-template-columns: minmax(300px, 430px) minmax(180px, 1fr) minmax(280px, 360px);
+        }
+        .hub-col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+        .hub-col-center { align-self: stretch; justify-content: flex-end; align-items: center; padding-bottom: 5vh; }
+
+        /* Título */
+        #main-menu .menu-title { font-size: clamp(1.4rem, 2.2vw, 1.85rem); line-height: 1.2; margin: 0; }
+        /* Estos elementos fijan su propio display: que "hidden" siga ganando siempre */
+        .hub-badge.hidden, .death-record.hidden, .hub-hero-card.hidden { display: none !important; }
+        #main-menu .menu-subtitle { font-size: 10px; line-height: 1.7; color: var(--hub-gold); margin: 0; text-shadow: 0 2px 0 #000; }
+
+        /* Botones principales */
+        .menu-btns { display: flex; flex-direction: column; gap: 12px; margin-top: 6px; }
+        .hub-btn {
+            display: flex; align-items: center; gap: 14px; width: 100%;
+            padding: 15px 18px; border-radius: 14px; color: #fff; text-align: left;
+            font-family: 'Press Start 2P', cursive; font-size: 12px; line-height: 1.3;
+            border: 2px solid rgba(255,255,255,.14); border-bottom-width: 5px;
+            transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
+            text-shadow: 0 2px 0 rgba(0,0,0,.35);
+        }
+        .hub-btn > i { width: 22px; text-align: center; font-size: 15px; }
+        .hub-btn .hub-btn-label { flex: 1; }
+        .hub-btn:hover { transform: translateX(4px); filter: brightness(1.12); }
+        .hub-btn:active { transform: translateY(2px); border-bottom-width: 3px; }
+        .hub-btn:focus-visible, .hub-chip:focus-visible, .hub-icon-btn:focus-visible, .skin-card button:focus-visible { outline: 3px solid #fde047; outline-offset: 2px; }
+        .hub-btn-play { background: linear-gradient(180deg, #22c55e, #16a34a); border-color: #15803d; border-bottom-color: #14532d; font-size: 15px; padding: 19px 18px; box-shadow: 0 0 28px rgba(34,197,94,.45); }
+        .hub-btn-play > i { font-size: 18px; }
+        .hub-btn-shop { background: linear-gradient(180deg, #3b82f6, #2563eb); border-color: #1d4ed8; border-bottom-color: #1e3a8a; }
+        .hub-btn-mp { background: linear-gradient(180deg, #a855f7, #7e22ce); border-color: #6b21a8; border-bottom-color: #3b0764; }
+        .hub-kbd {
+            font-family: 'Roboto Mono', monospace; font-size: 10px; font-weight: 700; line-height: 1;
+            padding: 4px 6px; border-radius: 6px; background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.3);
+        }
+        @media (hover: none) { .hub-kbd { display: none; } }
+        .hub-badge {
+            min-width: 24px; height: 24px; padding: 0 7px; border-radius: 12px; font-size: 10px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--hub-gold); color: #1c1400; text-shadow: none; box-shadow: 0 0 12px rgba(250,204,21,.7);
+            animation: hubPulse 1.6s ease-in-out infinite;
+        }
+        @keyframes hubPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+
+        /* Chips (nombre, estudios, cristales...) */
+        .hub-chip {
+            display: inline-flex; align-items: center; gap: 10px; min-width: 0;
+            padding: 8px 12px; border-radius: 12px; color: #fff; text-align: left;
+            background: var(--hub-panel); border: 1px solid rgba(255,255,255,.14);
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            transition: border-color .15s, background .15s, transform .12s;
+        }
+        button.hub-chip:hover { border-color: rgba(255,255,255,.4); background: rgba(30,18,60,.85); }
+        button.hub-chip:active { transform: scale(.98); }
+        .hub-chip-text { display: flex; flex-direction: column; gap: 5px; line-height: 1; min-width: 0; }
+        .hub-chip-label { font-family: 'Press Start 2P', cursive; font-size: 7px; letter-spacing: .14em; text-transform: uppercase; color: #94a3b8; }
+        .hub-chip-value { font-family: 'Press Start 2P', cursive; font-size: 10px; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .hub-profile .hub-chip-value { color: #a5f3fc; }
+        .hub-profile .hub-chip-edit { font-size: 10px; color: #67e8f9; opacity: .7; }
+        .hub-avatar {
+            position: relative; width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle at 50% 35%, rgba(103,232,249,.45), rgba(8,51,68,.9)); border: 1px solid rgba(103,232,249,.5);
+        }
+        .hub-avatar img { position: absolute; inset: 2px; width: calc(100% - 4px); height: calc(100% - 4px); object-fit: contain; image-rendering: pixelated; }
+        .hub-avatar i { color: #67e8f9; font-size: 14px; }
+        .hub-coins { border-color: rgba(250,204,21,.45); font-family: 'Press Start 2P', cursive; font-size: 12px; color: #fef08a; }
+        .hub-coins i { color: var(--hub-gold); }
+        .hub-icon-btn {
+            width: 42px; height: 42px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center;
+            color: #e2e8f0; background: var(--hub-panel); border: 1px solid rgba(255,255,255,.14);
+            transition: border-color .15s, transform .2s;
+        }
+        .hub-icon-btn:hover { border-color: rgba(255,255,255,.45); }
+        .hub-icon-btn:hover i.fa-gear { transform: rotate(60deg); }
+        .hub-icon-btn i { transition: transform .3s; }
+        .hub-sub-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .hub-sub-btns .hub-chip > i { font-size: 14px; width: 18px; text-align: center; }
+        .hub-sub-class > i { color: #fca5a5; }
+        .hub-sub-class { border-color: rgba(248,113,113,.35); }
+
+        /* Tarjetas de la columna derecha */
+        .hub-card {
+            background: var(--hub-panel); border: 1px solid var(--hub-line); border-radius: 16px; padding: 14px 16px;
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 12px 30px rgba(0,0,0,.35);
+        }
+        .hub-card-title { font-family: 'Press Start 2P', cursive; font-size: 9px; letter-spacing: .14em; color: var(--hub-gold); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .hub-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .hub-stat { background: var(--hub-soft); border: 1px solid rgba(255,255,255,.06); border-radius: 10px; padding: 9px 10px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+        .hub-stat-val { font-family: 'Press Start 2P', cursive; font-size: 12px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .hub-stat-lbl { font-family: 'Roboto Mono', monospace; font-size: 10px; color: #94a3b8; line-height: 1.2; }
+        .hub-progress { height: 4px; border-radius: 2px; background: rgba(255,255,255,.08); overflow: hidden; }
+        .hub-progress > span { display: block; height: 100%; background: linear-gradient(90deg, #a855f7, #facc15); border-radius: 2px; transition: width .4s; }
+        .hub-records-tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+        .hub-records-tabs button { flex: 1; padding: 6px 0; font-size: 9px; font-weight: 700; border-radius: 8px; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.05); color: #9ca3af; transition: all .15s; }
+        .hub-records-tabs button.is-active { background: #7e22ce; border-color: #c084fc; color: #fff; }
+        .hub-records-tabs button.is-active.is-global { background: #2563eb; border-color: #60a5fa; }
+        #leaderboard-menu li { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-radius: 6px; }
+        #leaderboard-menu li:first-child { background: rgba(250,204,21,.08); }
+
+        /* Personaje equipado */
+        .hub-hero-plate {
+            display: flex; flex-direction: column; align-items: center; gap: 7px; padding: 10px 20px 11px;
+            background: rgba(10,5,25,.72); border: 1px solid rgba(255,255,255,.18); border-radius: 14px;
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); color: #fff; transition: border-color .15s, transform .12s;
+        }
+        .hub-hero-plate:hover { border-color: rgba(250,204,21,.6); transform: translateY(-2px); }
+        .hub-hero-kicker { font-family: 'Press Start 2P', cursive; font-size: 7px; letter-spacing: .18em; color: #94a3b8; text-transform: uppercase; }
+        .hub-hero-name { font-family: 'Press Start 2P', cursive; font-size: 12px; color: #fff; text-shadow: 0 2px 0 #000; }
+        .hub-hero-change { font-family: 'Roboto Mono', monospace; font-size: 10px; font-weight: 700; color: var(--hub-gold); }
+        .hub-hero-card { display: none; align-items: center; gap: 14px; }
+        .hub-hero-art {
+            position: relative; width: 74px; height: 74px; border-radius: 14px; flex-shrink: 0; overflow: hidden;
+            background: rgba(20,12,45,.9);
+            background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--skin, #3b82f6) 55%, transparent), rgba(5,0,17,.9) 75%);
+            border: 1px solid rgba(255,255,255,.18); display: flex; align-items: center; justify-content: center;
+        }
+        .hub-hero-art img { position: absolute; inset: 4px; width: calc(100% - 8px); height: calc(100% - 8px); object-fit: contain; image-rendering: pixelated; }
+        .hub-hero-art i { font-size: 26px; color: #fff; opacity: .85; }
+
+        /* Móvil / tablet: una sola columna con scroll y el personaje en tarjeta */
+        @media (max-width: 1023px) {
+            .hub-bg { background: rgba(5,0,17,.8); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+            .hub-inner { max-width: 560px; padding: 12px 16px 24px; }
+            .hub-main { grid-template-columns: 1fr; gap: 14px; align-items: start; }
+            .hub-col-center { display: none; }
+            .hub-hero-card { display: flex; }
+            .hub-col-left { text-align: center; }
+            #main-menu .menu-title { font-size: clamp(1.1rem, 6vw, 2rem); margin-top: 6px; }
+        }
+        @media (max-width: 380px) {
+            .hub-btn { font-size: 10px; padding: 13px 14px; }
+            .hub-btn-play { font-size: 12px; padding: 16px 14px; }
+            .hub-profile .hub-chip-edit { display: none; }
+        }
+        /* Horizontal con poca altura (móvil tumbado): dos columnas compactas */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .hub-inner { max-width: none; padding: 8px 14px 12px; gap: 8px; }
+            .hub-main { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+            .hub-col-center { display: none; }
+            .hub-col-left { text-align: left; gap: 8px; }
+            #main-menu .menu-title { font-size: 1.25rem; margin-top: 0; }
+            #main-menu .menu-subtitle { display: none; }
+            .menu-btns { gap: 8px; margin-top: 0; }
+            .hub-btn, .hub-btn-play { padding: 10px 12px; font-size: 10px; }
+            .hub-hero-card { display: flex; }
+            .hub-hero-art { width: 54px; height: 54px; }
+            .hub-card { padding: 10px 12px; }
+            .hub-avatar { width: 32px; height: 32px; }
+            .hub-icon-btn { width: 36px; height: 36px; }
+        }
+
+        /* ---------- CUARTEL GENERAL ---------- */
+        #shop-menu { background: radial-gradient(ellipse at 50% -10%, #1e1b4b 0%, #070214 55%, #030008 100%); }
+        .shop-header {
+            position: relative; z-index: 2; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px;
+            padding: 12px 18px; background: rgba(5,0,17,.75); border-bottom: 1px solid var(--hub-line);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        }
+        .shop-header > :last-child { justify-self: end; }
+        .shop-back { justify-self: start; display: inline-flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; font-weight: 700; font-size: 13px; color: #e2e8f0; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.15); transition: background .15s, transform .12s; }
+        .shop-back:hover { background: rgba(255,255,255,.12); }
+        .shop-back:active { transform: scale(.97); }
+        #hq-title { font-size: clamp(0.8rem, 2.4vw, 1.35rem); text-shadow: 0 3px 0 #000; white-space: nowrap; }
+        .shop-body { flex: 1; overflow-y: auto; overflow-x: hidden; }
+        .shop-body-inner { max-width: 1120px; margin: 0 auto; padding: 16px 18px 40px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+        .shop-tabs { display: inline-flex; padding: 5px; gap: 5px; border-radius: 14px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); }
+        .shop-tab { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 10px; font-weight: 700; font-size: 13px; color: #9ca3af; transition: background .15s, color .15s; }
+        .shop-tab:hover { color: #fff; }
+        .shop-tab.is-active { background: #2563eb; color: #fff; box-shadow: 0 4px 14px rgba(37,99,235,.45); }
+        .shop-tab-count { font-family: 'Roboto Mono', monospace; font-size: 10px; padding: 2px 6px; border-radius: 6px; background: rgba(0,0,0,.3); }
+        .shop-hint { font-family: 'Roboto Mono', monospace; font-size: 11px; color: #94a3b8; text-align: center; }
+        #skins-container, #skills-container { width: 100%; }
+        @media (max-width: 640px) {
+            .shop-header { grid-template-columns: auto 1fr auto; padding: 10px 12px; }
+            .shop-back span { display: none; }
+            .shop-back { padding: 10px 13px; }
+            .shop-body-inner { padding: 12px 12px 32px; }
+            .shop-tabs { width: 100%; }
+            .shop-tab { flex: 1; justify-content: center; font-size: 10px; padding: 9px 6px; white-space: nowrap; }
+            .shop-tab > i { display: none; }
+        }
+
+        /* Tarjetas de personaje */
+        .skin-card {
+            position: relative; display: flex; flex-direction: column; align-items: center; text-align: center;
+            padding: 12px 12px 12px; border-radius: 16px; background: rgba(255,255,255,.04);
+            border: 2px solid rgba(255,255,255,.09); transition: transform .15s, border-color .15s, box-shadow .15s;
+        }
+        .skin-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,.22); box-shadow: 0 10px 24px rgba(0,0,0,.35); }
+        .skin-card.is-active { border-color: #60a5fa; background: rgba(37,99,235,.14); box-shadow: 0 0 22px rgba(59,130,246,.35); }
+        .skin-art {
+            position: relative; width: 100%; aspect-ratio: 1 / 1; max-height: 150px; border-radius: 12px; margin-bottom: 10px; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(20,12,45,.9);
+            background: radial-gradient(circle at 50% 38%, color-mix(in srgb, var(--skin, #3b82f6) 45%, transparent) 0%, rgba(5,0,17,.85) 72%);
+            border: 1px solid rgba(255,255,255,.07);
+        }
+        .skin-card.is-owned:not(.is-active) .skin-art { cursor: pointer; }
+        .skin-art img { position: absolute; inset: 8%; width: 84%; height: 84%; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(0 6px 6px rgba(0,0,0,.5)); transition: transform .2s; }
+        .skin-card:hover .skin-art img { transform: scale(1.06) translateY(-2px); }
+        .skin-art-fallback { font-size: 32px; color: #fff; opacity: .8; }
+        .skin-card.is-locked .skin-art img { filter: grayscale(.55) brightness(.75) drop-shadow(0 6px 6px rgba(0,0,0,.5)); }
+        .skin-card.is-secret .skin-art img { filter: brightness(0) drop-shadow(0 0 8px rgba(168,85,247,.6)); }
+        .skin-secret-mark { position: absolute; font-family: 'Press Start 2P', cursive; font-size: 26px; color: #c084fc; text-shadow: 0 3px 0 #000; }
+        .skin-tag {
+            position: absolute; top: 7px; left: 7px; z-index: 1; padding: 4px 6px; border-radius: 6px;
+            font-family: 'Press Start 2P', cursive; font-size: 7px; letter-spacing: .06em;
+        }
+        .skin-tag-eq { background: #2563eb; color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.4); }
+        .skin-tag-own { background: rgba(22,163,74,.9); color: #fff; }
+        .skin-tag-lock { left: auto; right: 7px; background: rgba(0,0,0,.6); color: #fca5a5; }
+        .skin-card h3 { min-height: 2rem; }
+        .skin-card .skin-desc { font-size: 10px; line-height: 1.3; color: #9ca3af; min-height: 2.6em; margin-bottom: 10px; }
+
+        /* Tarjetas de habilidad */
+        .skill-key { font-family: 'Press Start 2P', cursive; font-size: 8px; padding: 3px 5px; border-radius: 5px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); color: #e5e7eb; }
+
+        /* ---------- PAUSA Y DERROTA ---------- */
+        .hub-modal-panel {
+            width: 100%; max-width: 360px; padding: 22px; border-radius: 20px; text-align: center;
+            background: rgba(10,5,25,.92); border: 2px solid var(--hub-line); box-shadow: 0 20px 50px rgba(0,0,0,.5);
+            animation: hubIn .2s ease-out both;
+        }
+        .hub-modal-panel .hub-btn { justify-content: center; text-align: center; }
+        .hub-modal-panel .hub-btn:hover { transform: translateY(-1px); }
+        .hub-btn-ghost { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.14); border-bottom-color: rgba(0,0,0,.4); }
+        .hud-pause-btn {
+            width: 34px; height: 30px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,.8); border: 1px solid rgba(255,255,255,.25); color: #fff; font-size: 12px;
+        }
+        .hud-pause-btn:hover { background: rgba(40,40,40,.9); }
+        .death-record { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 10px; padding: 6px 12px; border-radius: 999px; background: var(--hub-gold); color: #1c1400; font-family: 'Press Start 2P', cursive; font-size: 9px; box-shadow: 0 0 20px rgba(250,204,21,.7); animation: hubPulse 1.2s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) {
+            .hub-inner, .hub-modal-panel, .hub-badge, .death-record { animation: none; }
+            .hub-btn, .skin-card, .skin-art img { transition: none; }
+        }
+
         /* Personalización de scrollbar para listados */
-        #skins-container::-webkit-scrollbar, #skills-container::-webkit-scrollbar { width: 8px; }
-        #skins-container::-webkit-scrollbar-track, #skills-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); border-radius: 4px; }
-        #skins-container::-webkit-scrollbar-thumb, #skills-container::-webkit-scrollbar-thumb { background: #4ade80; border-radius: 4px; }
+        .shop-body::-webkit-scrollbar, #main-menu::-webkit-scrollbar { width: 8px; }
+        .shop-body::-webkit-scrollbar-track, #main-menu::-webkit-scrollbar-track { background: rgba(0,0,0,0.35); }
+        .shop-body::-webkit-scrollbar-thumb, #main-menu::-webkit-scrollbar-thumb { background: #7e22ce; border-radius: 4px; }
     </style>
 
 </head>
@@ -426,7 +672,7 @@
     <!-- CAPA DE INTERFAZ (HUD) -->
     <div id="ui-layer" class="absolute inset-0 flex flex-col justify-between p-4 sm:p-6 z-10 pointer-events-none">
         <!-- HUD SUPERIOR -->
-        <header class="flex justify-between items-start w-full">
+        <header id="hud-top" class="flex justify-between items-start w-full">
             <div class="flex flex-col gap-2">
                 <!-- Distancia y Bioma -->
                 <div class="bg-black/80 border border-white/20 px-4 py-2 rounded-lg pointer-events-auto backdrop-blur-sm">
@@ -434,10 +680,16 @@
                     <div class="text-white font-pixel text-lg sm:text-xl"><span id="scoreVal">0</span>m</div>
                 </div>
                 
-                <!-- Botón de Pánico -->
-                <button id="btn-panic" class="bg-red-600/90 hover:bg-red-500 text-white border-2 border-red-800 px-3 py-1.5 rounded-lg text-xs font-bold pointer-events-auto flex items-center gap-2 transition-all shadow-[0_0_10px_rgba(220,38,38,0.5)]">
-                    <i class="fa-solid fa-graduation-cap"></i> CLASE (Esc / Q)
-                </button>
+                <div class="flex items-center gap-2">
+                    <!-- Botón de Pánico -->
+                    <button id="btn-panic" class="bg-red-600/90 hover:bg-red-500 text-white border-2 border-red-800 px-3 py-1.5 rounded-lg text-xs font-bold pointer-events-auto flex items-center gap-2 transition-all shadow-[0_0_10px_rgba(220,38,38,0.5)]">
+                        <i class="fa-solid fa-graduation-cap"></i> <span id="btn-panic-label">CLASE (Esc / Q)</span>
+                    </button>
+                    <!-- Botón de Pausa (solo partidas de un jugador) -->
+                    <button id="btn-pause" class="hud-pause-btn pointer-events-auto" title="Pausa (P)" aria-label="Pausa">
+                        <i class="fa-solid fa-pause"></i>
+                    </button>
+                </div>
             </div>
 
             <!-- Cristales de Aether (Moneda) -->
@@ -451,7 +703,7 @@
         </header>
 
         <!-- PANEL DE HABILIDADES EN JUEGO (HUD CENTRAL DERECHA) -->
-        <div class="absolute right-4 top-24 flex flex-col gap-1.5 pointer-events-auto z-10">
+        <div id="hud-skills" class="absolute right-4 top-24 flex flex-col gap-1.5 pointer-events-auto z-10">
             <!-- Habilidad Inservibilidad -->
             <button id="hud-skill-invincible" class="flex items-center gap-2 bg-yellow-950/90 hover:bg-yellow-900 border border-yellow-500/50 p-1.5 rounded-lg text-white font-mono text-xs shadow-lg transition-all active:scale-95">
                 <span class="bg-yellow-500 px-1.5 py-0.5 rounded font-bold text-[10px] text-black">E</span>
@@ -551,7 +803,7 @@
         </div>
 
         <!-- CONTROLES MÓVILES (Ocultos en PC) -->
-        <div class="flex justify-between w-full pb-4 sm:hidden pointer-events-auto">
+        <div id="mobile-controls" class="flex justify-between w-full pb-4 sm:hidden pointer-events-auto">
             <button id="btn-left" class="w-16 h-16 bg-white/10 border border-white/20 rounded-full flex items-center justify-center text-white/50 active:bg-white/30 backdrop-blur-sm">
                 <i class="fa-solid fa-chevron-left text-2xl"></i>
             </button>
@@ -564,77 +816,120 @@
         </div>
     </div>
 
-    <!-- MENÚ PRINCIPAL -->
-    <div id="main-menu" class="absolute inset-0 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center z-30 pointer-events-auto text-center px-4 overflow-y-auto">
-        <button id="mp-open-btn" onclick="mpOpenModal()" class="absolute top-3 right-3 sm:top-4 sm:right-4 z-40 bg-purple-700/80 hover:bg-purple-600 border border-purple-400/50 text-white font-pixel text-[9px] sm:text-[10px] px-2.5 py-2 sm:px-3 rounded-lg flex items-center gap-1.5 sm:gap-2 shadow-lg">
-            <i class="fa-solid fa-users"></i> <span class="hidden sm:inline">MULTIPLAYER</span><span class="sm:hidden">MP</span>
-        </button>
-        <h1 id="menu-title-h1" class="font-pixel text-4xl sm:text-6xl menu-title farsaland-title leading-tight">
-            LA LIGA DE LOS<br>PODRIDOS
-        </h1>
-        <p class="text-gray-300 font-mono menu-subtitle text-xs sm:text-sm max-w-2xl leading-relaxed">
-            <span class="text-yellow-400 font-bold font-pixel text-[11px] block mb-2">¡DERROTA A TODOS LOS ENEMIGOS QUE AMENAZAN FARSALAND!</span>
-        </p>
+    <!-- MENÚ PRINCIPAL (HUB) -->
+    <!-- El centro queda despejado para que se vea al personaje equipado en 3D. En
+         pantallas estrechas se pasa a una columna y el personaje se muestra en tarjeta. -->
+    <div id="main-menu" class="absolute inset-0 z-30 pointer-events-auto">
+        <div class="hub-bg" aria-hidden="true"></div>
+        <div class="hub-inner">
+            <!-- Barra superior: perfil, cristales y ajustes -->
+            <div class="hub-top">
+                <button id="btn-edit-name" onclick="openNameModal()" class="hub-chip hub-profile" title="Cambiar nombre">
+                    <span class="hub-avatar"><i class="fa-solid fa-user"></i><img id="hub-avatar-img" alt="" draggable="false" hidden></span>
+                    <span class="hub-chip-text">
+                        <span class="hub-chip-label">Nombre:</span>
+                        <span id="display-player-name" class="hub-chip-value">Anonimo</span>
+                    </span>
+                    <i class="fa-solid fa-pen hub-chip-edit"></i>
+                </button>
+                <div class="hub-top-right">
+                    <div class="hub-chip hub-coins" title="Cristales Aether">
+                        <i class="fa-solid fa-gem"></i><span id="menu-coins-val">0</span>
+                    </div>
+                    <button id="btn-controls-config" onclick="openControlsModal()" class="hub-icon-btn" title="Ajustes" aria-label="Ajustes">
+                        <i class="fa-solid fa-gear"></i>
+                    </button>
+                </div>
+            </div>
 
-        <!-- TOP RÉCORDS con pestañas -->
-        <div class="bg-black/60 border border-purple-500/30 p-4 rounded-xl menu-records max-w-xs w-full">
-            <h3 class="font-pixel text-[10px] text-yellow-400 mb-3 tracking-widest"><i class="fa-solid fa-trophy mr-1"></i> TOP RÉCORDS</h3>
-            <!-- Pestañas -->
-            <div class="flex gap-2 mb-3">
-                <button id="tab-records-personal" onclick="switchRecordsTab('personal')" class="flex-1 py-1 text-[9px] font-bold rounded bg-purple-600 text-white border border-purple-400 transition-all">
-                    <i class="fa-solid fa-user mr-1"></i>PERSONAL
-                </button>
-                <button id="tab-records-global" onclick="switchRecordsTab('global')" class="flex-1 py-1 text-[9px] font-bold rounded bg-gray-700 text-gray-400 border border-gray-600 transition-all">
-                    <i class="fa-solid fa-globe mr-1"></i>GLOBAL
-                </button>
-            </div>
-            <!-- Panel personal -->
-            <div id="panel-records-personal">
-                <ol id="leaderboard-menu" class="text-white font-mono text-xs space-y-1">
-                    <!-- Dinámico -->
-                </ol>
-            </div>
-            <!-- Panel global -->
-            <div id="panel-records-global" class="hidden">
-                <ol id="leaderboard-global" class="text-white font-mono text-xs space-y-1">
-                    <li class="text-gray-500 text-[10px]"><i class="fa-solid fa-spinner fa-spin mr-1"></i>Cargando...</li>
-                </ol>
+            <div class="hub-main">
+                <!-- Columna izquierda: título y acciones -->
+                <section class="hub-col hub-col-left">
+                    <h1 id="menu-title-h1" class="font-pixel menu-title farsaland-title">LA LIGA DE LOS<br>PODRIDOS</h1>
+                    <p class="menu-subtitle font-pixel">¡DERROTA A TODOS LOS ENEMIGOS QUE AMENAZAN FARSALAND!</p>
+                    <!-- Personaje equipado (solo en pantallas estrechas) -->
+                    <button class="hub-card hub-hero-card" onclick="openShop('skins')" title="Cambiar personaje">
+                        <span class="hub-hero-art" id="hub-hero-art"><i class="fa-solid fa-user"></i><img id="hub-hero-img" alt="" draggable="false" hidden></span>
+                        <span class="flex flex-col items-start gap-2 min-w-0 text-left">
+                            <span class="hub-hero-kicker">Personaje</span>
+                            <span class="hub-hero-name hub-skin-name">Inservible</span>
+                            <span class="hub-hero-change"><i class="fa-solid fa-repeat mr-1"></i>Cambiar</span>
+                        </span>
+                    </button>
+                    <nav class="menu-btns">
+                        <button id="btn-start" class="hub-btn hub-btn-play">
+                            <i class="fa-solid fa-play"></i><span class="hub-btn-label">EMPEZAR PARTIDA</span><kbd class="hub-kbd">Enter</kbd>
+                        </button>
+                        <button id="btn-shop" class="hub-btn hub-btn-shop">
+                            <i class="fa-solid fa-shirt"></i><span class="hub-btn-label">Cuartel General</span><span id="hub-shop-badge" class="hub-badge hidden" title="Cosas que ya puedes comprar"></span>
+                        </button>
+                        <button id="mp-open-btn" onclick="mpOpenModal()" class="hub-btn hub-btn-mp">
+                            <i class="fa-solid fa-users"></i><span class="hub-btn-label">MULTIPLAYER</span>
+                        </button>
+                    </nav>
+                    <div class="hub-sub-btns">
+                        <button id="btn-study-select" onclick="openStudyModal()" class="hub-chip">
+                            <i class="fa-solid fa-book-open text-gray-300"></i>
+                            <span class="hub-chip-text">
+                                <span class="hub-chip-label">Estudios:</span>
+                                <span id="display-study-name" class="hub-chip-value">SMR</span>
+                            </span>
+                        </button>
+                        <button onclick="togglePanicMode()" class="hub-chip hub-sub-class" title="Modo Clase">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            <span class="hub-chip-text">
+                                <span class="hub-chip-label">Modo Clase</span>
+                                <span id="hub-panic-keys" class="hub-chip-value">Esc / Q</span>
+                            </span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Centro: el personaje en 3D + su placa -->
+                <section class="hub-col hub-col-center">
+                    <button class="hub-hero-plate" onclick="openShop('skins')" title="Cambiar personaje">
+                        <span class="hub-hero-kicker">Personaje</span>
+                        <span class="hub-hero-name hub-skin-name">Inservible</span>
+                        <span class="hub-hero-change"><i class="fa-solid fa-repeat mr-1"></i>Cambiar</span>
+                    </button>
+                </section>
+
+                <!-- Columna derecha: progreso y récords -->
+                <section class="hub-col hub-col-right">
+                    <div class="hub-card">
+                        <h3 class="hub-card-title"><i class="fa-solid fa-chart-simple"></i> TU PROGRESO</h3>
+                        <div class="hub-stat-grid">
+                            <div class="hub-stat"><span id="stat-best" class="hub-stat-val">0m</span><span class="hub-stat-lbl">Mejor distancia</span></div>
+                            <div class="hub-stat"><span id="stat-bosses" class="hub-stat-val">0/6</span><span class="hub-stat-lbl">Jefes vencidos</span><span class="hub-progress"><span id="stat-bosses-bar" style="width:0%"></span></span></div>
+                            <div class="hub-stat"><span id="stat-skins" class="hub-stat-val">1/1</span><span class="hub-stat-lbl">Personajes</span><span class="hub-progress"><span id="stat-skins-bar" style="width:0%"></span></span></div>
+                            <div class="hub-stat"><span id="stat-skills" class="hub-stat-val">0</span><span class="hub-stat-lbl">Habilidades</span></div>
+                        </div>
+                    </div>
+                    <!-- TOP RÉCORDS con pestañas -->
+                    <div class="hub-card menu-records">
+                        <h3 class="hub-card-title"><i class="fa-solid fa-trophy"></i> TOP RÉCORDS</h3>
+                        <div class="hub-records-tabs">
+                            <button id="tab-records-personal" onclick="switchRecordsTab('personal')" class="is-active">
+                                <i class="fa-solid fa-user mr-1"></i>PERSONAL
+                            </button>
+                            <button id="tab-records-global" onclick="switchRecordsTab('global')" class="is-global">
+                                <i class="fa-solid fa-globe mr-1"></i>GLOBAL
+                            </button>
+                        </div>
+                        <div id="panel-records-personal">
+                            <ol id="leaderboard-menu" class="text-white font-mono text-xs space-y-1">
+                                <!-- Dinámico -->
+                            </ol>
+                        </div>
+                        <div id="panel-records-global" class="hidden">
+                            <div id="leaderboard-global" class="text-white font-mono text-xs">
+                                <div class="text-gray-500 text-[10px]"><i class="fa-solid fa-spinner fa-spin mr-1"></i>Cargando...</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
         </div>
-        
-        <div class="menu-btns flex flex-col sm:flex-row gap-4 justify-center items-center w-full max-w-md">
-            <button id="btn-start" class="w-full sm:w-auto bg-green-600 hover:bg-green-500 text-white font-pixel text-sm py-4 px-8 rounded-xl border-b-4 border-green-800 transition-all hover:translate-y-1 hover:border-b-0 shadow-[0_0_20px_rgba(34,197,94,0.4)]">
-                EMPEZAR PARTIDA
-            </button>
-            <button id="btn-shop" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-6 rounded-xl border-b-4 border-blue-800 transition-all flex items-center justify-center gap-2 text-sm">
-                <i class="fa-solid fa-users"></i> Cuartel General
-            </button>
-
-        </div>
-        <!-- Botón Modo Clase (junto a nombre) -->
-        <button onclick="togglePanicMode()" class="hidden sm:block absolute bottom-4 right-[calc(1rem+180px)] bg-red-900/80 hover:bg-red-700 border-2 border-red-600/60 hover:border-red-400 text-white p-2.5 rounded-lg transition-all pointer-events-auto shadow-[0_0_10px_rgba(220,38,38,0.3)]" title="Modo Clase">
-            <i class="fa-solid fa-book text-red-300 text-sm"></i>
-        </button>
-        <!-- Botón nombre abajo a la derecha -->
-        <button id="btn-edit-name" onclick="openNameModal()" class="absolute bottom-4 right-4 bg-black/80 border-2 border-cyan-500/60 hover:border-cyan-400 hover:bg-black/90 text-white font-pixel px-4 py-2.5 rounded-lg transition-all flex items-center gap-3 pointer-events-auto shadow-[0_0_12px_rgba(6,182,212,0.3)] hover:shadow-[0_0_18px_rgba(6,182,212,0.5)]">
-            <i class="fa-solid fa-user text-cyan-400 text-xs"></i>
-            <div class="flex flex-col items-start leading-none gap-1">
-                <span class="text-cyan-500 text-[7px] tracking-widest uppercase">Nombre:</span>
-                <span id="display-player-name" class="text-cyan-200 text-[10px] tracking-wider">Anonimo</span>
-            </div>
-        </button>
-        <!-- Botón Selección de Estudios abajo a la izquierda -->
-        <button id="btn-study-select" onclick="openStudyModal()" class="absolute bottom-4 left-4 bg-gray-700/90 hover:bg-gray-600 border-2 border-gray-500/60 hover:border-gray-400 text-white font-pixel px-4 py-2.5 rounded-lg transition-all flex items-center gap-3 pointer-events-auto shadow-[0_0_10px_rgba(100,100,100,0.3)]">
-            <i class="fa-solid fa-book-open text-gray-300 text-xs"></i>
-            <div class="flex flex-col items-start leading-none gap-1">
-                <span class="text-gray-400 text-[7px] tracking-widest uppercase">Estudios:</span>
-                <span id="display-study-name" class="text-gray-200 text-[10px] tracking-wider whitespace-nowrap">SMR</span>
-            </div>
-        </button>
-        <!-- Botón Configuración de Controles (junto a estudios) -->
-        <button id="btn-controls-config" onclick="openControlsModal()" class="hidden sm:block absolute bottom-4 left-[calc(1rem+180px)] bg-gray-800/90 hover:bg-gray-700 border-2 border-gray-600/60 hover:border-gray-400 text-white p-2.5 rounded-lg transition-all pointer-events-auto shadow-[0_0_10px_rgba(100,100,100,0.3)]" title="Configurar controles">
-            <i class="fa-solid fa-gamepad text-gray-300 text-sm"></i>
-        </button>
     </div>
 
     <!-- MODAL DE CONFIGURACIÓN DE CONTROLES -->
@@ -709,64 +1004,63 @@
     </div>
 
     <!-- CUARTEL GENERAL (TIENDA DE SKINS Y HABILIDADES) -->
-    <div id="shop-menu" class="absolute inset-0 bg-black/95 backdrop-blur-xl hidden flex flex-col items-center justify-center z-40 pointer-events-auto">
-        <div class="w-full max-w-5xl px-4 flex flex-col items-center">
-            <h2 id="hq-title" class="font-pixel text-xl sm:text-2xl text-yellow-400 mb-1 text-center cursor-pointer select-none" title="">CUARTEL GENERAL</h2>
-            <!-- Cristales Aether en el shop -->
-            <div class="flex items-center gap-2 mb-4 bg-black/60 border border-yellow-500/40 px-4 py-1.5 rounded-full">
-                <i class="fa-solid fa-gem text-yellow-400 text-sm animate-pulse"></i>
-                <span id="shop-coins-val" class="text-yellow-200 font-pixel text-sm">0</span>
-                <span class="text-yellow-500 font-mono text-[10px] uppercase tracking-widest">Cristales Aether</span>
+    <div id="shop-menu" class="absolute inset-0 hidden flex flex-col z-40 pointer-events-auto">
+        <!-- Cabecera fija: volver, título (3 toques = terminal secreta) y cristales -->
+        <div class="shop-header">
+            <button id="btn-close-shop" class="shop-back" title="Volver al Menú"><i class="fa-solid fa-arrow-left"></i><span>Volver al Menú</span></button>
+            <h2 id="hq-title" class="font-pixel text-yellow-400 text-center cursor-pointer select-none" title="">CUARTEL GENERAL</h2>
+            <div class="hub-chip hub-coins" title="Cristales Aether">
+                <i class="fa-solid fa-gem animate-pulse"></i><span id="shop-coins-val">0</span>
             </div>
-            
-            <!-- BOTÓN ANUNCIO RECOMPENSADO -->
-            <div id="ad-section" class="flex flex-col items-center gap-1 mb-4">
-                <!-- Versión nativa (app) -->
-                <div id="ad-native-block" class="flex flex-col items-center gap-1 hidden">
-                    <button id="btn-watch-ad" onclick="watchRewardedAd()"
-                        class="bg-yellow-500 hover:bg-yellow-400 active:bg-yellow-600 text-black font-pixel text-[10px] px-5 py-2.5 rounded-xl border-b-4 border-yellow-700 transition-all flex items-center gap-2 shadow-[0_0_16px_rgba(234,179,8,0.5)]">
-                        <i class="fa-solid fa-tv"></i>
-                        <span id="ad-btn-label">VER ANUNCIO</span>
-                    </button>
-                    <span id="ad-counter-text" class="text-yellow-400 font-mono text-[10px]">0/5 anuncios → 2000 💎</span>
-                    <span id="ad-tier-text" class="text-gray-400 font-mono text-[9px]"></span>
-                    <span id="ad-reset-text" class="text-gray-500 font-mono text-[9px]"></span>
-                </div>
-                <!-- Versión web: aviso -->
-                <div id="ad-web-block" class="flex flex-col items-center gap-2">
-                    <div class="flex items-center gap-3 bg-gray-800/80 border border-yellow-500/30 px-5 py-3 rounded-xl">
-                        <i class="fa-solid fa-mobile-screen text-yellow-400 text-xl"></i>
-                        <div class="text-left">
-                            <div class="text-yellow-300 font-pixel text-[9px] leading-relaxed">SOLO EN LA APLICACIÓN</div>
-                            <div class="text-gray-400 font-mono text-[9px] mt-0.5">Descarga la app para ganar cristales</div>
+        </div>
+        <div class="shop-body">
+            <div class="shop-body-inner">
+    <!-- BOTÓN ANUNCIO RECOMPENSADO -->
+                    <div id="ad-section" class="flex flex-col items-center gap-1">
+                        <!-- Versión nativa (app) -->
+                        <div id="ad-native-block" class="flex flex-col items-center gap-1 hidden">
+                            <button id="btn-watch-ad" onclick="watchRewardedAd()"
+                                class="bg-yellow-500 hover:bg-yellow-400 active:bg-yellow-600 text-black font-pixel text-[10px] px-5 py-2.5 rounded-xl border-b-4 border-yellow-700 transition-all flex items-center gap-2 shadow-[0_0_16px_rgba(234,179,8,0.5)]">
+                                <i class="fa-solid fa-tv"></i>
+                                <span id="ad-btn-label">VER ANUNCIO</span>
+                            </button>
+                            <span id="ad-counter-text" class="text-yellow-400 font-mono text-[10px]">0/5 anuncios → 2000 💎</span>
+                            <span id="ad-tier-text" class="text-gray-400 font-mono text-[9px]"></span>
+                            <span id="ad-reset-text" class="text-gray-500 font-mono text-[9px]"></span>
+                        </div>
+                        <!-- Versión web: aviso -->
+                        <div id="ad-web-block" class="flex flex-col items-center gap-2">
+                            <div class="flex items-center gap-3 bg-gray-800/80 border border-yellow-500/30 px-5 py-3 rounded-xl">
+                                <i class="fa-solid fa-mobile-screen text-yellow-400 text-xl"></i>
+                                <div class="text-left">
+                                    <div class="text-yellow-300 font-pixel text-[9px] leading-relaxed">SOLO EN LA APLICACIÓN</div>
+                                    <div class="text-gray-400 font-mono text-[9px] mt-0.5">Descarga la app para ganar cristales</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
+                <!-- Selector de Pestañas (Skins / Habilidades) -->
+                <div class="shop-tabs" role="tablist">
+                    <button id="tab-skins" class="shop-tab is-active" role="tab">
+                        <i class="fa-solid fa-shirt"></i> <span>Héroes y Jefes</span> <span id="shop-skins-count" class="shop-tab-count"></span>
+                    </button>
+                    <button id="tab-skills" class="shop-tab" role="tab">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> <span>Habilidades Especiales</span>
+                    </button>
+                </div>
+                <p id="shop-hint" class="shop-hint"></p>
+
+                <!-- CONTENEDOR SKINS -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4" id="skins-container">
+                    <!-- Generado dinámicamente -->
+                </div>
+
+                <!-- CONTENEDOR HABILIDADES -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden" id="skills-container">
+                    <!-- Generado dinámicamente -->
                 </div>
             </div>
-
-            <!-- Selector de Pestañas (Skins / Habilidades) -->
-            <div class="flex gap-4 mb-6">
-                <button id="tab-skins" class="px-4 py-2 bg-blue-600 text-white font-bold text-xs sm:text-sm rounded-lg hover:bg-blue-500 transition-colors">
-                    <i class="fa-solid fa-shirt mr-1"></i> Héroes y Jefes
-                </button>
-                <button id="tab-skills" class="px-4 py-2 bg-gray-700 text-gray-300 font-bold text-xs sm:text-sm rounded-lg hover:bg-gray-600 transition-colors">
-                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Habilidades Especiales
-                </button>
-            </div>
-
-            <!-- CONTENEDOR SKINS -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full overflow-y-auto max-h-[50vh] pb-8" id="skins-container">
-                <!-- Generado dinámicamente -->
-            </div>
-
-            <!-- CONTENEDOR HABILIDADES -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full overflow-y-auto max-h-[50vh] pb-8 hidden" id="skills-container">
-                <!-- Generado dinámicamente -->
-            </div>
-            
-            <button id="btn-close-shop" class="mt-6 bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-8 rounded-lg text-sm transition-colors">
-                Volver al Menú
-            </button>
         </div>
     </div>
 
@@ -776,12 +1070,15 @@
         <p class="text-gray-300 font-mono mb-6 text-sm" id="death-msg">Has sido absorbido por la brecha del espacio-tiempo...</p>
         
         <div class="bg-black/50 p-6 rounded-xl border border-white/10 mb-6 w-full max-w-xs">
+            <div id="death-new-record" class="death-record hidden"><i class="fa-solid fa-crown"></i> <span>¡NUEVO RÉCORD!</span></div>
             <div class="text-xs text-gray-400 uppercase tracking-widest mb-1">Distancia Alcanzada</div>
             <div class="font-pixel text-3xl text-white mb-4"><span id="finalScore">0</span>m</div>
             <div class="flex items-center justify-center gap-2">
                 <i class="fa-solid fa-gem text-yellow-400"></i>
+                <span id="death-coins" class="text-yellow-200 font-pixel text-xs">+0</span>
                 <span class="text-yellow-400 font-bold font-mono text-sm">Cristales Guardados</span>
             </div>
+            <div id="death-cheat-note" class="hidden text-[10px] text-red-300 font-mono mt-3">Trucos activos: esta partida no cuenta para récords.</div>
         </div>
 
         <!-- TOP RÉCORDS EN DERROTA -->
@@ -799,6 +1096,23 @@
             <button id="btn-back-menu" class="bg-gray-800 hover:bg-gray-700 text-white font-pixel text-sm py-4 px-8 rounded-xl transition-all border border-gray-600">
                 VOLVER AL MENÚ
             </button>
+        </div>
+        <button id="btn-death-shop" class="mt-4 text-blue-300 hover:text-blue-200 font-bold text-xs flex items-center gap-2 transition-colors">
+            <i class="fa-solid fa-shirt"></i> <span>Ir al Cuartel General</span>
+        </button>
+    </div>
+
+    <!-- MENÚ DE PAUSA (solo un jugador) -->
+    <div id="pause-menu" class="hidden absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 pointer-events-auto px-4">
+        <div class="hub-modal-panel">
+            <h2 class="font-pixel text-2xl text-white mb-2">PAUSA</h2>
+            <p class="font-mono text-xs text-gray-400 mb-5"><span id="pause-distance">0</span>m · <i class="fa-solid fa-gem text-yellow-400"></i> <span id="pause-coins">+0</span></p>
+            <div class="flex flex-col gap-3">
+                <button id="btn-resume" class="hub-btn hub-btn-play"><i class="fa-solid fa-play"></i><span>CONTINUAR</span></button>
+                <button id="btn-pause-restart" class="hub-btn hub-btn-ghost"><i class="fa-solid fa-rotate-right"></i><span>REINICIAR</span></button>
+                <button id="btn-pause-quit" class="hub-btn hub-btn-ghost"><i class="fa-solid fa-house"></i><span>SALIR AL MENÚ</span></button>
+            </div>
+            <p class="font-mono text-[10px] text-gray-500 mt-4">Si sales, los cristales recogidos se guardan pero la distancia no cuenta.</p>
         </div>
     </div>
 
@@ -993,6 +1307,30 @@
             "TOP RÉCORDS": "TOP SCORES",
             "Cargando...": "Loading...",
             "EMPEZAR PARTIDA": "START GAME",
+            // --- Hub (menú principal renovado) ---
+            "Cambiar nombre": "Change name",
+            "Ajustes": "Settings",
+            "Personaje": "Character",
+            "Cambiar": "Change",
+            "Cambiar personaje": "Change character",
+            "Modo Clase": "Class Mode",
+            "TU PROGRESO": "YOUR PROGRESS",
+            "Mejor distancia": "Best distance",
+            "Jefes vencidos": "Bosses defeated",
+            "Personajes": "Characters",
+            "Habilidades": "Skills",
+            "Cosas que ya puedes comprar": "Things you can already buy",
+            "¡NUEVO RÉCORD!": "NEW RECORD!",
+            "Trucos activos: esta partida no cuenta para récords.": "Cheats active: this run doesn't count for records.",
+            "Ir al Cuartel General": "Go to Headquarters",
+            "PAUSA": "PAUSED",
+            "CONTINUAR": "RESUME",
+            "REINICIAR": "RESTART",
+            "SALIR AL MENÚ": "QUIT TO MENU",
+            "Si sales, los cristales recogidos se guardan pero la distancia no cuenta.": "If you quit, the crystals you collected are kept but the distance doesn't count.",
+            "Pausa (P)": "Pause (P)",
+            "Pausa": "Pause",
+            "Pausa / Reanudar": "Pause / Resume",
             "TIENDA": "SHOP",
             "Nombre:": "Name:",
             "Estudios:": "Studies:",
@@ -1232,6 +1570,11 @@
         }
 
         let LANG = _detectLangSync() || 'es';
+        // Escapa texto que viene de fuera (ranking global, nombres de otros jugadores)
+        // antes de meterlo en innerHTML, para que nadie pueda inyectar HTML/JS.
+        function escapeHtml(str) {
+            return String(str == null ? '' : str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
         function t(s) {
             if (LANG !== 'en' || s == null) return s;
             return Object.prototype.hasOwnProperty.call(I18N_STR, s) ? I18N_STR[s] : s;
@@ -1311,6 +1654,8 @@
                     const esB = document.getElementById('lang-btn-es');
                     const enB = document.getElementById('lang-btn-en');
                     if (esB && enB) {
+                        esB.textContent = 'Español';
+                        enB.textContent = 'English';
                         const onCls = 'bg-yellow-500 text-black border-yellow-700';
                         const offCls = 'bg-gray-700 text-gray-300 border-gray-800 hover:bg-gray-600';
                         esB.className = 'flex-1 py-2 font-pixel text-[9px] rounded-lg transition-all border-b-2 ' + (LANG === 'es' ? onCls : offCls);
@@ -2039,45 +2384,32 @@
             const list = document.getElementById('leaderboard-global');
             if (!list) return;
             if (SB_URL === 'PEGA_AQUI_TU_PROJECT_URL') {
-                list.innerHTML = '<li class="text-gray-400 text-[9px] leading-relaxed text-center">⚙️ Configura Supabase en el código para activar los récords globales</li>';
+                list.innerHTML = '<div class="text-gray-400 text-[9px] leading-relaxed text-center">⚙️ Configura Supabase en el código para activar los récords globales</div>';
                 return;
             }
-            list.innerHTML = '<li class="text-gray-500 text-[10px]"><i class="fa-solid fa-spinner fa-spin mr-1"></i>Cargando...</li>';
+            list.innerHTML = '<div class="text-gray-500 text-[10px]"><i class="fa-solid fa-spinner fa-spin mr-1"></i>' + t('Cargando...') + '</div>';
             const scores = await fetchGlobalScores();
             if (scores === null) {
-                list.innerHTML = '<li class="text-gray-400 text-[10px]">Error al conectar. Revisa la URL y clave de Supabase.</li>';
+                list.innerHTML = '<div class="text-gray-400 text-[10px]"><i class="fa-solid fa-wifi mr-1"></i>' + (LANG === 'en' ? 'Could not load the global ranking. Check your connection.' : 'No se pudo cargar el ranking global. Revisa tu conexión.') + '</div>';
                 return;
             }
             if (scores.length === 0) {
-                list.innerHTML = '<li class="text-gray-500 text-[10px]">¡Sé el primero en el ranking global!</li>';
+                list.innerHTML = '<div class="text-gray-500 text-[10px]">' + (LANG === 'en' ? 'Be the first in the global ranking!' : '¡Sé el primero en el ranking global!') + '</div>';
                 return;
             }
-            list.innerHTML = '';
-            const top3 = scores.slice(0, 3);
-            const next3 = scores.slice(3, 6);
+            // Una sola lista (antes eran dos columnas donde el nombre quedaba partido en
+            // varias líneas); el nombre se escapa porque lo puede escribir cualquiera.
             const medals = ['🥇','🥈','🥉'];
-
-            function buildColumn(items, startIndex) {
-                return items.map((d, i) => {
-                    const rank = startIndex + i;
-                    const prefix = medals[rank] || `${rank+1}º`;
-                    const name = d.name || 'Anonimo';
-                    return `<li class="flex flex-col leading-tight">${prefix} <span class="text-cyan-300 font-bold truncate">${name}</span><span class="text-yellow-400 font-bold text-[9px]">${d.score.toLocaleString()}m</span></li>`;
-                }).join('');
-            }
-
-            list.innerHTML = `
-                <div class="grid grid-cols-2 gap-x-3 gap-y-0">
-                    <div>
-                        <div class="text-[8px] text-purple-400 font-bold tracking-widest mb-1 uppercase">Top 1-3</div>
-                        <ol class="space-y-1.5 text-white font-mono text-[10px]">${buildColumn(top3, 0)}</ol>
-                    </div>
-                    <div>
-                        <div class="text-[8px] text-gray-400 font-bold tracking-widest mb-1 uppercase">Top 4-6</div>
-                        <ol class="space-y-1.5 text-white font-mono text-[10px]">${buildColumn(next3, 3)}</ol>
-                    </div>
-                </div>
-            `;
+            const myName = (gameState.playerName || '').toUpperCase();
+            list.innerHTML = '<ol class="space-y-1">' + scores.slice(0, 6).map((d, rank) => {
+                const prefix = medals[rank] || `<span class="text-gray-500 text-[9px] w-5 text-center">${rank + 1}º</span>`;
+                const rawName = d.name || 'Anonimo';
+                const isMe = myName && myName !== 'ANONIMO' && String(rawName).toUpperCase() === myName;
+                return `<li class="flex items-center gap-2 px-1.5 py-1 rounded-md ${isMe ? 'bg-cyan-500/10' : ''}">`
+                    + `<span class="w-5 text-center">${prefix}</span>`
+                    + `<span class="flex-1 truncate font-bold ${isMe ? 'text-cyan-200' : 'text-cyan-300'}">${escapeHtml(rawName)}</span>`
+                    + `<span class="text-yellow-400 font-bold">${Math.floor(d.score).toLocaleString()}m</span></li>`;
+            }).join('') + '</ol>';
         }
         let currentRecordsTab = 'personal';
         function switchRecordsTab(tab) {
@@ -2086,14 +2418,12 @@
             const btnG = document.getElementById('tab-records-global');
             const panelP = document.getElementById('panel-records-personal');
             const panelG = document.getElementById('panel-records-global');
+            btnP.classList.toggle('is-active', tab === 'personal');
+            btnG.classList.toggle('is-active', tab !== 'personal');
             if (tab === 'personal') {
-                btnP.className = "flex-1 py-1 text-[9px] font-bold rounded bg-purple-600 text-white border border-purple-400 transition-all";
-                btnG.className = "flex-1 py-1 text-[9px] font-bold rounded bg-gray-700 text-gray-400 border border-gray-600 transition-all";
                 panelP.classList.remove('hidden');
                 panelG.classList.add('hidden');
             } else {
-                btnP.className = "flex-1 py-1 text-[9px] font-bold rounded bg-gray-700 text-gray-400 border border-gray-600 transition-all";
-                btnG.className = "flex-1 py-1 text-[9px] font-bold rounded bg-blue-600 text-white border border-blue-400 transition-all";
                 panelP.classList.add('hidden');
                 panelG.classList.remove('hidden');
                 renderGlobalLeaderboard();
@@ -2107,7 +2437,7 @@
             let html = "";
             gameState.highScores.forEach((score, index) => {
                 const medals = ['🥇','🥈','🥉'];
-                html += `<li>${medals[index] || (index+1)+'º:'} <span class="text-yellow-400 font-bold">${score.toLocaleString()}</span> metros</li>`;
+                html += `<li>${medals[index] || (index+1)+'º:'} <span class="text-yellow-400 font-bold">${score.toLocaleString()}</span> ${LANG === 'en' ? 'meters' : 'metros'}</li>`;
             });
             if (html === "") html = '<li class="text-gray-500">Sin récords aún</li>';
             
@@ -2133,7 +2463,8 @@
         // --- SISTEMA DE NOMBRES ---
         function updateNameDisplay() {
             const el = document.getElementById('display-player-name');
-            if (el) el.textContent = gameState.playerName || 'Anonimo';
+            const nm = gameState.playerName || 'Anonimo';
+            if (el) el.textContent = (nm === 'Anonimo') ? t('Anonimo') : nm;
         }
 
         function openNameModal() {
@@ -2156,6 +2487,7 @@
             saveData();
             updateNameDisplay();
             closeNameModal();
+            if (typeof mpNotifySkinChange === 'function') { try { mpNotifySkinChange(); } catch (e) {} }
         }
 
         // Cerrar modal con Escape
@@ -2539,6 +2871,8 @@
             if (_hudGdCount) _hudGdCount.innerText = gameState.skills.guadana;
             if (_hudCbCount) _hudCbCount.innerText = gameState.skills.cabrarang;
             uiCoins.innerText = gameState.coins;
+            const _menuCoins = document.getElementById('menu-coins-val');
+            if (_menuCoins) _menuCoins.innerText = gameState.coins.toLocaleString();
         }
 
         // --- CACHÉ DE TEXTURAS (precargadas para evitar lag al spawnear bosses) ---
@@ -7625,6 +7959,41 @@
 
         let activeKeys = {};
 
+        // ¿Está el menú principal a la vista y sin ninguna ventana/modal encima?
+        function isHubMenuFree() {
+            if (document.getElementById('main-menu').classList.contains('hidden')) return false;
+            // Con el teclado sobre otro botón, Enter debe pulsar ESE botón, no empezar partida
+            const ae = document.activeElement;
+            if (ae && ae !== document.body && ae.id !== 'btn-start' && ['BUTTON', 'A', 'SELECT'].includes(ae.tagName)) return false;
+            const modals = ['controls-modal', 'name-modal', 'study-modal', 'tras-modal', 'wod-modal', 'cheat-terminal', 'mp-modal', 'mp-code-edit-modal', 'mp-results', 'shop-menu'];
+            if (modals.some(id => { const el = document.getElementById(id); return el && !el.classList.contains('hidden'); })) return false;
+            return document.getElementById('panic-screen').style.display !== 'block';
+        }
+
+        // Tecla de pausa: se actúa al SOLTARLA y solo si no se ha pulsado otra tecla
+        // mientras estaba pulsada, para no chocar con los combos secretos que usan la P
+        // (P+O+D, S+P+E+D), que se hacen manteniendo varias teclas a la vez.
+        let _pauseKeyArmed = false;
+        window.addEventListener('keydown', (e) => {
+            if (listeningFor) return;
+            const el = document.activeElement;
+            if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) { _pauseKeyArmed = false; return; }
+            const ks = typeof getControlKeys === 'function' ? getControlKeys('pause') : ['p'];
+            const isPauseKey = ks.some(k => k === e.key || k.toLowerCase() === e.key.toLowerCase());
+            if (isPauseKey) { if (!e.repeat) _pauseKeyArmed = true; }
+            else _pauseKeyArmed = false;
+            // En el menú de pausa, Enter también reanuda
+            if (pauseMenuOpen && e.key === 'Enter') { e.preventDefault(); resumeGame(); }
+        });
+        window.addEventListener('keyup', (e) => {
+            const ks = typeof getControlKeys === 'function' ? getControlKeys('pause') : ['p'];
+            const isPauseKey = ks.some(k => k === e.key || k.toLowerCase() === e.key.toLowerCase());
+            if (isPauseKey && _pauseKeyArmed) {
+                _pauseKeyArmed = false;
+                togglePauseMenu();
+            }
+        });
+
         window.addEventListener('keydown', (e) => {
             // Si hay un modal de controles activo capturando tecla, no procesar aquí
             if (listeningFor) return;
@@ -7791,12 +8160,22 @@
                 return;
             }
             
-            if (!isPlaying && !document.getElementById('death-screen').classList.contains('hidden')) {
+            if (!isPlaying && !isPaused && !document.getElementById('death-screen').classList.contains('hidden')) {
                 const restartKeys = typeof getControlKeys !== 'undefined' ? getControlKeys('restartX') : ['x'];
-                if (restartKeys.some(k => k === e.key || k.toLowerCase() === key)) {
+                const _ae = document.activeElement;
+                const _enterOnButton = e.key === 'Enter' && _ae && _ae !== document.body && ['BUTTON', 'A'].includes(_ae.tagName);
+                if ((e.key === 'Enter' && !_enterOnButton) || restartKeys.some(k => k === e.key || k.toLowerCase() === key)) {
+                    e.preventDefault();
                     startGame();
                     return;
                 }
+            }
+
+            // Enter en el menú principal = empezar partida (si no hay ninguna ventana abierta)
+            if (e.key === 'Enter' && !isPlaying && !isPaused && !e.repeat && isHubMenuFree()) {
+                e.preventDefault();
+                startGame();
+                return;
             }
 
             if (!isPlaying || isPaused) return;
@@ -8011,6 +8390,13 @@
         function startGame() {
             initAudio(); 
             sounds.start(); 
+            // Que ningún botón del menú se quede con el foco: si no, Espacio/Enter
+            // (saltar) podrían volver a "pulsarlo" en mitad de la partida.
+            try { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); } catch (e) {}
+            hidePauseMenu();
+            if (document.getElementById('panic-screen').style.display !== 'block') isPaused = false;
+            runStartCoins = gameState.coins;
+            const _wodBanner = document.getElementById('wod-banner'); if (_wodBanner) _wodBanner.remove();
 
             obstacles.forEach(o => scene.remove(o.mesh));
             collectibles.forEach(c => scene.remove(c.mesh));
@@ -8190,10 +8576,16 @@
             }
             lastKilledBy = null;
 
+            const _prevBest = gameState.highScores.length ? Math.max(...gameState.highScores) : 0;
+            const _isNewRecord = !cheatUsed && Math.floor(distance) > _prevBest && Math.floor(distance) > 0;
             submitScore(distance);
             saveData();
 
-            document.getElementById('finalScore').innerText = Math.floor(distance);
+            document.getElementById('finalScore').innerText = Math.floor(distance).toLocaleString();
+            document.getElementById('death-new-record').classList.toggle('hidden', !_isNewRecord);
+            document.getElementById('death-cheat-note').classList.toggle('hidden', !cheatUsed);
+            const _gained = Math.max(0, gameState.coins - runStartCoins);
+            document.getElementById('death-coins').innerText = '+' + _gained.toLocaleString();
             
             setTimeout(() => {
                 document.getElementById('death-screen').classList.remove('hidden');
@@ -8452,6 +8844,28 @@
             if (trasCheatSkin !== null) { gameState.activeSkin = trasCheatSkin; trasCheatSkin = null; }
             isPlaying = false;
             isPaused = false;
+            hidePauseMenu();
+            // Se puede llegar aquí a mitad de partida (menú de pausa), así que se para la
+            // música y se quitan de la escena los personajes/efectos de los eventos de jefe,
+            // que si no se quedaban flotando detrás del menú.
+            try { stopBossMusic(); } catch (e) {}
+            try { stopBgm(0.4); } catch (e) {}
+            window._currentAllySpawnBattleId = null;
+            try { cleanupVictorInfernal(); cleanupGabrielHelper(); cleanupAllies(); } catch (e) {}
+            try { hideVictorInfernalSpeech(); hideGabrielHelperSpeech(); } catch (e) {}
+            luzbelPhase2State = 'none';
+            if (victorMinionMesh) { scene.remove(victorMinionMesh); victorMinionMesh = null; }
+            victorMinionActive = false;
+            const _vs = document.getElementById('victor-speech'); if (_vs) _vs.classList.add('hidden');
+            if (window._megaBossMinionMesh) { scene.remove(window._megaBossMinionMesh); window._megaBossMinionMesh = null; }
+            window._megaBossMinionActive = false;
+            megaGroundMinions.forEach(mm => scene.remove(mm)); megaGroundMinions = [];
+            megaIntroState = 'none';
+            if (cabrarangMesh) { scene.remove(cabrarangMesh); cabrarangMesh = null; cabrarangData = null; }
+            try { clearLightningSprites(); hideRain(); } catch (e) {}
+            const _wodBanner = document.getElementById('wod-banner'); if (_wodBanner) _wodBanner.remove();
+            ['pataslargas-indicator', 'superesclavo-indicator'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
+            isPatasLargasActive = false; isSuperEsclavoActive = false;
             
             obstacles.forEach(o => scene.remove(o.mesh));
             collectibles.forEach(c => scene.remove(c.mesh));
@@ -8471,9 +8885,199 @@
             buildPlayerModel();
             playerGroup.position.set(0, groundY, 0);
             playerGroup.rotation.set(0, 0, 0);
+            setupMenuScene();
 
             document.getElementById('death-screen').classList.add('hidden');
             document.getElementById('main-menu').classList.remove('hidden');
+            refreshHub();
+        }
+
+        // Deja la escena 3D como en el menú inicial: cámara delante del personaje y el
+        // bioma de Farsalia. Antes, al volver de una partida, la cámara se quedaba donde
+        // había muerto el jugador (cientos de metros más adelante) y el personaje del
+        // menú dejaba de verse.
+        function setupMenuScene() {
+            if (!scene || !camera) return;
+            camera.position.set(0, 8, 12);
+            camera.lookAt(0, 0, -20);
+            cameraShake = 0;
+            activeBiome = BIOMES[0];
+            currentBiomeIndex = 0;
+            biomeTransitioning = false;
+            biomeTransitionProgress = 0;
+            prevBiomeId = null;
+            if (trackPlaneOld) { scene.remove(trackPlaneOld); trackPlaneOld = null; }
+            scene.background = new THREE.Color(activeBiome.sky);
+            if (scene.fog) scene.fog.color = new THREE.Color(activeBiome.fog);
+            const groundTex = window._farsaliaGroundTex;
+            trackPlane.material.map = groundTex || null;
+            if (groundTex) { trackPlane.material.color.set(0xffffff); groundTex.offset.y = 0; }
+            else trackPlane.material.color = new THREE.Color(activeBiome.ground);
+            trackPlane.material.transparent = false;
+            trackPlane.material.opacity = 1.0;
+            trackPlane.material.needsUpdate = true;
+            trackPlane.position.z = 0;
+            gridHelper.visible = false;
+            gridHelper.position.z = 0;
+            if (window._biomePaths) {
+                for (const [pid, mesh] of Object.entries(window._biomePaths)) {
+                    mesh.userData._fadingOut = false;
+                    mesh.visible = (pid === 'farsalia');
+                    mesh.position.z = 0;
+                    mesh.material.opacity = 1.0;
+                    mesh.material.needsUpdate = true;
+                    if (mesh.material.map) mesh.material.map.offset.y = 0;
+                }
+            }
+            if (window._victorBeachMesh) window._victorBeachMesh.visible = false;
+            if (window._victorSeaMesh) window._victorSeaMesh.visible = false;
+            if (typeof uiBiomeName !== 'undefined' && uiBiomeName) {
+                uiBiomeName.innerText = tf(activeBiome, 'name');
+                uiBiomeName.style.color = activeBiome.textColor;
+            }
+        }
+
+        // ============================================================
+        // HUB: datos del menú principal (perfil, progreso, personaje)
+        // ============================================================
+        let runStartCoins = 0;
+
+        function getSkinImageUrl(skinId) {
+            return TEXTURE_URLS[mpGetSkinTextureKey(skinId)] || null;
+        }
+
+        // Pone la imagen de una skin en un <img> (con el icono como respaldo si no carga)
+        function setSkinImage(img, skinId) {
+            if (!img) return;
+            const url = getSkinImageUrl(skinId);
+            if (!url) { img.hidden = true; img.removeAttribute('src'); return; }
+            img.onload = () => { img.hidden = false; };
+            img.onerror = () => { img.hidden = true; };
+            if (img.getAttribute('src') !== url) img.src = url;
+            else if (img.complete && img.naturalWidth) img.hidden = false;
+        }
+
+        // ¿Se puede comprar ya esta skin (condición cumplida + cristales suficientes)?
+        // Mismas reglas que los botones de compra de renderSkinsShop().
+        function canBuySkinNow(skin) {
+            if (!skin || gameState.unlockedSkins.includes(skin.id)) return false;
+            const price = skin.price || 0;
+            if (gameState.coins < price) return false;
+            if (skin.secret && !skin.unlock) return false;
+            if (!skin.unlock) return true;
+            if (skin.unlock.allBossesWithSkins) return !!skin.unlock.withSkin && skinIsRevealed(skin);
+            if (skin.unlock.withSkin) {
+                return !!(gameState.skinUnlockFlags && gameState.skinUnlockFlags[skin.variantOf] && gameState.skinUnlockFlags[skin.variantOf][skin.unlock.boss]);
+            }
+            if (skin.id === 'panchitoboy') return (gameState.bossDefeats['luzbel'] || 0) >= 1;
+            return false;
+        }
+
+        // Skins que cuentan para el total: todas menos las secretas que aún no se tienen
+        function getSkinCounts() {
+            const all = Object.values(SKINS_DATA);
+            const owned = all.filter(sk => gameState.unlockedSkins.includes(sk.id)).length;
+            const total = all.filter(sk => !sk.secret || gameState.unlockedSkins.includes(sk.id)).length;
+            return { owned, total };
+        }
+
+        function refreshHub() {
+            updateNameDisplay();
+            updateHUDCounts();
+            const skin = SKINS_DATA[gameState.activeSkin] || SKINS_DATA['inservible'];
+            document.querySelectorAll('.hub-skin-name').forEach(el => { el.textContent = tf(skin, 'name'); });
+            const heroArt = document.getElementById('hub-hero-art');
+            if (heroArt) {
+                heroArt.style.setProperty('--skin', '#' + skin.color.toString(16).padStart(6, '0'));
+                const ic = heroArt.querySelector('i'); if (ic) ic.className = 'fa-solid ' + skin.icon;
+            }
+            setSkinImage(document.getElementById('hub-hero-img'), skin.id);
+            setSkinImage(document.getElementById('hub-avatar-img'), skin.id);
+
+            const best = gameState.highScores.length ? Math.max(0, ...gameState.highScores) : 0;
+            const bossesBeaten = ALL_STORY_BOSSES.filter(id => (gameState.bossDefeats[id] || 0) > 0).length;
+            const { owned, total } = getSkinCounts();
+            const skillsOwned = Object.values(gameState.skills || {}).reduce((a, b) => a + (Number(b) || 0), 0);
+            const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+            setTxt('stat-best', best.toLocaleString() + 'm');
+            setTxt('stat-bosses', bossesBeaten + '/' + ALL_STORY_BOSSES.length);
+            setTxt('stat-skins', owned + '/' + total);
+            setTxt('stat-skills', skillsOwned);
+            const bb = document.getElementById('stat-bosses-bar'); if (bb) bb.style.width = (100 * bossesBeaten / ALL_STORY_BOSSES.length) + '%';
+            const sb = document.getElementById('stat-skins-bar'); if (sb) sb.style.width = (total ? 100 * owned / total : 0) + '%';
+
+            const buyable = Object.values(SKINS_DATA).filter(canBuySkinNow).length;
+            const badge = document.getElementById('hub-shop-badge');
+            if (badge) {
+                badge.textContent = buyable;
+                badge.classList.toggle('hidden', buyable === 0);
+            }
+            // (los controles se cargan más abajo en el script: en la primera llamada aún no existen)
+            try { syncControlLabels(); } catch (e) {}
+        }
+
+        // Muestra en la interfaz las teclas que el jugador tenga asignadas de verdad
+        // (antes el HUD decía siempre E/F/V/G/H y "Esc / Q" aunque se cambiaran).
+        function syncControlLabels() {
+            const panicTxt = getControlKeys('panic').map(formatKey).join(' / ');
+            const pk = document.getElementById('hub-panic-keys');
+            if (pk) pk.textContent = panicTxt;
+            const pl = document.getElementById('btn-panic-label');
+            if (pl) pl.textContent = t('CLASE') + ' (' + panicTxt + ')';
+            const pb = document.getElementById('btn-pause');
+            if (pb) pb.title = t('Pausa') + ' (' + getControlKeys('pause').map(formatKey).join(' / ') + ')';
+            const hudMap = { 'hud-skill-invincible': 'skillE', 'hud-skill-pataslargas': 'skillF', 'hud-skill-cabrarang': 'skillV', 'hud-skill-superesclavo': 'skillG', 'hud-skill-guadana': 'skillH' };
+            for (const [btnId, ctrl] of Object.entries(hudMap)) {
+                const keyEl = document.querySelector('#' + btnId + ' > span');
+                const ks = getControlKeys(ctrl);
+                if (keyEl && ks.length) keyEl.textContent = formatKey(ks[0]);
+            }
+        }
+
+        // ============================================================
+        // PAUSA (solo partidas de un jugador; en multijugador el Modo Clase
+        // ya pausa a toda la sala)
+        // ============================================================
+        let pauseMenuOpen = false;
+        let _resumePauseAfterPanic = false;
+
+        function canPauseNow() {
+            return isPlaying && !isPaused && !(typeof mpInRace !== 'undefined' && mpInRace)
+                && document.getElementById('death-screen').classList.contains('hidden');
+        }
+
+        function pauseGame() {
+            if (!canPauseNow()) return;
+            isPaused = true;
+            pauseMenuOpen = true;
+            if (bossMusic) { try { bossMusic.stop(); } catch (e) {} }
+            document.getElementById('pause-distance').textContent = Math.floor(distance).toLocaleString();
+            document.getElementById('pause-coins').textContent = '+' + Math.max(0, gameState.coins - runStartCoins).toLocaleString();
+            document.getElementById('pause-menu').classList.remove('hidden');
+        }
+
+        function hidePauseMenu() {
+            pauseMenuOpen = false;
+            const pm = document.getElementById('pause-menu');
+            if (pm) pm.classList.add('hidden');
+        }
+
+        function resumeGame() {
+            if (!pauseMenuOpen) return;
+            hidePauseMenu();
+            isPaused = false;
+            lastTime = performance.now();
+            if (activeBoss) startBossMusic(activeBoss.id);
+        }
+
+        function togglePauseMenu() {
+            if (pauseMenuOpen) resumeGame();
+            else pauseGame();
+        }
+
+        function syncPauseButton() {
+            const b = document.getElementById('btn-pause');
+            if (b) b.classList.toggle('hidden', typeof mpInRace !== 'undefined' && mpInRace);
         }
 
 
@@ -8772,20 +9376,10 @@
 
         // Coloca el botón de controles justo a la derecha del de Estudios,
         // desplazándose si el nombre del curso (más largo en inglés) ensancha el botón.
-        function repositionControlsButton() {
-            const studyBtn = document.getElementById('btn-study-select');
-            const ctrlBtn = document.getElementById('btn-controls-config');
-            if (!studyBtn || !ctrlBtn) return;
-            // Esperar al layout
-            requestAnimationFrame(() => {
-                const w = studyBtn.offsetWidth;
-                if (w > 0) {
-                    // 1rem (left del estudio) + ancho del botón + 12px de separación
-                    ctrlBtn.style.left = 'calc(1rem + ' + w + 'px + 12px)';
-                }
-            });
-        }
-        window.addEventListener('resize', repositionControlsButton);
+        // Antes colocaba a mano el botón de controles junto al de Estudios; en el hub
+        // nuevo el botón de Ajustes vive en la barra superior y ya no hace falta moverlo.
+        // Se deja la función (vacía) porque se llama desde el arranque del idioma.
+        function repositionControlsButton() {}
 
         // Inicializar display al cargar
         updateStudyDisplay();
@@ -10017,8 +10611,19 @@
         }
 
         function togglePanicMode() {
+            // Si estaba abierto el menú de pausa, el Modo Clase lo tapa y al salir de
+            // clase se vuelve a la pausa en vez de reanudar la partida de golpe.
+            if (pauseMenuOpen) {
+                hidePauseMenu();
+                isPaused = false;
+                _resumePauseAfterPanic = true;
+            }
             const newState = !isPaused;
             mpApplyPanicState(newState);
+            if (!newState && _resumePauseAfterPanic) {
+                _resumePauseAfterPanic = false;
+                pauseGame();
+            }
             // En multijugador, que cualquiera active/desactive el Modo Clase pausa/reanuda
             // la partida para todos los jugadores de la sala, no solo para quien lo pulsó.
             if (typeof mpInRace !== 'undefined' && mpInRace) {
@@ -10060,7 +10665,7 @@
             if (!container) return;
             container.innerHTML = '';
             const shopCoins = document.getElementById('shop-coins-val');
-            if (shopCoins) shopCoins.innerText = gameState.coins;
+            if (shopCoins) shopCoins.innerText = gameState.coins.toLocaleString();
 
             // Agrupamos las skins por personaje: cada skin "base" (sin variantOf) forma
             // una familia junto a todas las variantes que la referencian mediante variantOf.
@@ -10098,7 +10703,7 @@
                 const isActive = gameState.activeSkin === skin.id;
                 
                 const card = document.createElement('div');
-                card.className = `p-4 rounded-xl border-2 flex flex-col items-center justify-between text-center transition-all ${isActive ? 'bg-blue-900/50 border-blue-400' : 'bg-gray-800/50 border-gray-600'}`;
+                card.className = `skin-card${isActive ? ' is-active' : ''}${isUnlocked ? ' is-owned' : ' is-locked'}${!revealed ? ' is-secret' : ''}`;
                 
                 const hasVariants = family.length > 1;
                 // Si es una skin secreta con condición aún no cumplida, no enseñamos ni su
@@ -10125,13 +10730,21 @@
                         <h3 class="text-white font-bold mb-1 text-xs md:text-sm h-8 flex items-center justify-center">${displayName}</h3>
                 `;
 
+                const imgUrl = getSkinImageUrl(skin.id);
+                const tagHTML = isActive
+                    ? `<span class="skin-tag skin-tag-eq">${t('EQUIPADA')}</span>`
+                    : (isUnlocked ? `<span class="skin-tag skin-tag-own"><i class="fa-solid fa-check"></i></span>`
+                                  : `<span class="skin-tag skin-tag-lock"><i class="fa-solid fa-lock"></i></span>`);
                 card.innerHTML = `
                     <div class="flex flex-col items-center w-full">
-                        <div class="w-12 h-12 rounded-full flex items-center justify-center mb-2 shadow-[0_0_15px_rgba(255,255,255,0.2)]" style="background-color: #${displayColorHex}">
-                            <i class="fa-solid ${displayIcon} text-lg text-white mix-blend-difference"></i>
+                        <div class="skin-art" style="--skin:#${(revealed ? skin.color : 0x6b21a8).toString(16).padStart(6, '0')}" ${isUnlocked && !isActive ? `title="${t('EQUIPAR')}"` : ''}>
+                            <i class="fa-solid ${displayIcon} skin-art-fallback"></i>
+                            ${imgUrl ? `<img src="${imgUrl}" alt="" loading="lazy" draggable="false" onerror="this.remove()">` : ''}
+                            ${!revealed ? '<span class="skin-secret-mark">?</span>' : ''}
+                            ${tagHTML}
                         </div>
                         ${nameRowHTML}
-                        <p class="text-gray-400 text-[9px] md:text-xs mb-3 h-8 leading-tight">${displayDesc}</p>
+                        <p class="skin-desc">${displayDesc}</p>
                     </div>
                 `;
 
@@ -10173,7 +10786,11 @@
                         buildPlayerModel();
                         renderSkinsShop();
                         mpNotifySkinChange();
+                        refreshHub();
+                        if (sounds && sounds.coin) { try { sounds.coin(); } catch (e) {} }
                     };
+                    const art = card.querySelector('.skin-art');
+                    if (art) art.onclick = btn.onclick;
                 } else if (skin.secret && !skin.unlock) {
                     // Skin secreta SIN condición de jefes (ej. Marker): solo se desbloquea
                     // con código, no se puede comprar. Las que sí llevan unlock (ej.
@@ -10195,13 +10812,7 @@
                             } else {
                                 btn.className = "w-full py-2 rounded font-bold text-xs flex justify-center items-center gap-2 mt-auto bg-yellow-600 hover:bg-yellow-500 text-white";
                                 btn.innerHTML = `<i class="fa-solid fa-gem"></i> ${skin.price}`;
-                                btn.onclick = () => {
-                                    gameState.coins -= skin.price;
-                                    gameState.unlockedSkins.push(skin.id);
-                                    saveData();
-                                    updateHUDCounts();
-                                    renderSkinsShop();
-                                };
+                                btn.onclick = () => buySkin(skin, skin.price);
                             }
                         } else {
                         const allowedSkinIds = skin.unlock.allBossesWithSkins;
@@ -10220,7 +10831,8 @@
                         const baseSkinData = SKINS_DATA[skin.variantOf] || skin;
                         const hasKill = !!(gameState.skinUnlockFlags && gameState.skinUnlockFlags[skin.variantOf] && gameState.skinUnlockFlags[skin.variantOf][skin.unlock.boss]);
                         const canAfford = gameState.coins >= (skin.price || 0);
-                        const bossName = skin.unlock.boss.charAt(0).toUpperCase() + skin.unlock.boss.slice(1);
+                        const _bossSkin = SKINS_DATA[skin.unlock.boss];
+                        const bossName = _bossSkin ? tf(_bossSkin, 'name') : (skin.unlock.boss.charAt(0).toUpperCase() + skin.unlock.boss.slice(1));
                         if (!hasKill) {
                             btn.className = "w-full py-2 rounded font-bold text-[10px] bg-red-900/50 border border-red-500/50 text-red-300 cursor-not-allowed mt-auto flex flex-col items-center";
                             const lockMsg = LANG==='en'
@@ -10229,17 +10841,11 @@
                             btn.innerHTML = `<i class="fa-solid fa-lock mb-1"></i><span>${lockMsg}</span>`;
                         } else if (!canAfford) {
                             btn.className = "w-full py-2 rounded font-bold text-[10px] bg-yellow-900/50 border border-yellow-500/50 text-yellow-300 cursor-not-allowed mt-auto flex flex-col items-center";
-                            btn.innerHTML = `<i class="fa-solid fa-gem mb-1"></i><span>${skin.price} ${LANG==='en'?'Crystals':'Cristales'}</span><span class="text-[9px] text-green-400">${LANG==='en'?`✓ ${bossName} defeated`:`✓ ${bossName} derrotada`}</span>`;
+                            btn.innerHTML = `<i class="fa-solid fa-gem mb-1"></i><span>${skin.price} ${LANG==='en'?'Crystals':'Cristales'}</span><span class="text-[9px] text-green-400">${LANG==='en'?`✓ ${bossName} defeated`:`✓ ${bossName} vencido/a`}</span>`;
                         } else {
                             btn.className = "w-full py-2 rounded font-bold text-xs flex justify-center items-center gap-2 mt-auto bg-yellow-600 hover:bg-yellow-500 text-white";
                             btn.innerHTML = `<i class="fa-solid fa-gem"></i> ${skin.price}`;
-                            btn.onclick = () => {
-                                gameState.coins -= skin.price;
-                                gameState.unlockedSkins.push(skin.id);
-                                saveData();
-                                updateHUDCounts();
-                                renderSkinsShop();
-                            };
+                            btn.onclick = () => buySkin(skin, skin.price);
                         }
                     } else if (skin.id === 'panchitoboy') {
                         const luzbelDefeats = gameState.bossDefeats['luzbel'] || 0;
@@ -10254,13 +10860,7 @@
                         } else {
                             btn.className = "w-full py-2 rounded font-bold text-xs flex justify-center items-center gap-2 mt-auto bg-yellow-600 hover:bg-yellow-500 text-white";
                             btn.innerHTML = `<i class="fa-solid fa-gem"></i> ${LANG==='en'?'Buy 300':'Comprar 300'}`;
-                            btn.onclick = () => {
-                                gameState.coins -= (skin.price || 300);
-                                gameState.unlockedSkins.push(skin.id);
-                                saveData();
-                                updateHUDCounts();
-                                renderSkinsShop();
-                            };
+                            btn.onclick = () => buySkin(skin, skin.price || 300);
                         }
                     } else {
                         let progressCount, progressLabel;
@@ -10278,20 +10878,45 @@
                     const canAfford = gameState.coins >= skin.price;
                     btn.className = `w-full py-2 rounded font-bold text-xs flex justify-center items-center gap-2 mt-auto ${canAfford ? 'bg-yellow-600 hover:bg-yellow-500 text-white' : 'bg-gray-700 text-gray-500 cursor-not-allowed'}`;
                     btn.innerHTML = `<i class="fa-solid fa-gem"></i> ${skin.price}`;
-                    btn.onclick = () => {
-                        if (canAfford) {
-                            gameState.coins -= skin.price;
-                            gameState.unlockedSkins.push(skin.id);
-                            saveData();
-                            updateHUDCounts();
-                            renderSkinsShop();
-                        }
-                    };
+                    btn.onclick = () => { if (canAfford) buySkin(skin, skin.price); };
                 }
                 
                 card.appendChild(btn);
                 container.appendChild(card);
             });
+
+            const { owned, total } = getSkinCounts();
+            const cnt = document.getElementById('shop-skins-count');
+            if (cnt) cnt.textContent = owned + '/' + total;
+            const hint = document.getElementById('shop-hint');
+            if (hint && !container.classList.contains('hidden')) {
+                hint.textContent = LANG === 'en'
+                    ? 'Use the arrows to see each character\'s variants. Tap an owned character to equip it.'
+                    : 'Usa las flechas para ver las variantes de cada personaje. Toca uno que ya tengas para equiparlo.';
+            }
+        }
+
+        function buySkin(skin, price) {
+            if (gameState.unlockedSkins.includes(skin.id) || gameState.coins < price) return;
+            gameState.coins -= price;
+            gameState.unlockedSkins.push(skin.id);
+            saveData();
+            updateHUDCounts();
+            renderSkinsShop();
+            refreshHub();
+            if (sounds && sounds.skillUse) { try { sounds.skillUse(); } catch (e) {} }
+            showToast((LANG === 'en' ? '🎉 Unlocked: ' : '🎉 Desbloqueado: ') + tf(skin, 'name') + (LANG === 'en' ? ' — tap EQUIP to use it' : ' — pulsa EQUIPAR para usarlo'));
+        }
+
+        // Tecla asignada a cada habilidad (para enseñarla en la tienda y en el HUD)
+        const SKILL_CONTROL_IDS = { invincible: 'skillE', patasLargas: 'skillF', superEsclavo: 'skillG', guadana: 'skillH', cabrarang: 'skillV' };
+        function skillKeyLabel(skill) {
+            const ctrl = SKILL_CONTROL_IDS[skill.id];
+            if (ctrl && typeof getControlKeys === 'function') {
+                const ks = getControlKeys(ctrl);
+                if (ks.length) return ks.map(formatKey).join('/');
+            }
+            return skill.key || '';
         }
 
         function renderSkillsShop() {
@@ -10312,7 +10937,7 @@
                             <i class="fa-solid ${skill.icon} text-lg text-white"></i>
                         </div>
                         <div>
-                            <h3 class="text-white font-bold text-sm mb-0.5">${tf(skill,'name')}</h3>
+                            <h3 class="text-white font-bold text-sm mb-0.5 flex items-center gap-2 justify-center sm:justify-start">${tf(skill,'name')} <span class="skill-key" title="${LANG==='en'?'Key':'Tecla'}">${skillKeyLabel(skill)}</span></h3>
                             <p class="text-gray-400 text-[10px] leading-tight max-w-sm mb-1">${tf(skill,'desc')}</p>
                             <span class="text-xs text-yellow-400 font-bold bg-yellow-950/40 px-2 py-0.5 rounded border border-yellow-500/20">${LANG==='en'?'Owned':'Posees'}: ${count}</span>
                         </div>
@@ -10329,6 +10954,9 @@
                         saveData();
                         updateHUDCounts();
                         renderSkillsShop();
+                        refreshHub();
+                        if (sounds && sounds.coin) { try { sounds.coin(); } catch (e) {} }
+                        showToast('+1 ' + tf(skill, 'name') + ' (' + (LANG === 'en' ? 'owned: ' : 'tienes: ') + gameState.skills[skill.id] + ')');
                     }
                 };
 
@@ -10338,40 +10966,90 @@
         }
 
         // Navegación de pestañas en Cuartel General
-        document.getElementById('tab-skins').addEventListener('click', () => {
-            document.getElementById('tab-skins').className = "px-4 py-2 bg-blue-600 text-white font-bold text-xs sm:text-sm rounded-lg hover:bg-blue-500 transition-colors";
-            document.getElementById('tab-skills').className = "px-4 py-2 bg-gray-700 text-gray-300 font-bold text-xs sm:text-sm rounded-lg hover:bg-gray-600 transition-colors";
-            document.getElementById('skins-container').classList.remove('hidden');
-            document.getElementById('skills-container').classList.add('hidden');
-            renderSkinsShop();
-        });
+        function selectShopTab(tab) {
+            const isSkins = tab !== 'skills';
+            document.getElementById('tab-skins').classList.toggle('is-active', isSkins);
+            document.getElementById('tab-skills').classList.toggle('is-active', !isSkins);
+            document.getElementById('tab-skins').setAttribute('aria-selected', isSkins);
+            document.getElementById('tab-skills').setAttribute('aria-selected', !isSkins);
+            document.getElementById('skins-container').classList.toggle('hidden', !isSkins);
+            document.getElementById('skills-container').classList.toggle('hidden', isSkins);
+            if (isSkins) renderSkinsShop();
+            else {
+                renderSkillsShop();
+                const hint = document.getElementById('shop-hint');
+                if (hint) hint.textContent = LANG === 'en'
+                    ? 'Skills are consumable: each purchase adds one use. Activate them in-game with their key or the side buttons.'
+                    : 'Las habilidades se gastan: cada compra suma un uso. Actívalas en partida con su tecla o con los botones laterales.';
+            }
+        }
+        document.getElementById('tab-skins').addEventListener('click', () => selectShopTab('skins'));
+        document.getElementById('tab-skills').addEventListener('click', () => selectShopTab('skills'));
 
-        document.getElementById('tab-skills').addEventListener('click', () => {
-            document.getElementById('tab-skins').className = "px-4 py-2 bg-gray-700 text-gray-300 font-bold text-xs sm:text-sm rounded-lg hover:bg-gray-600 transition-colors";
-            document.getElementById('tab-skills').className = "px-4 py-2 bg-blue-600 text-white font-bold text-xs sm:text-sm rounded-lg hover:bg-blue-500 transition-colors";
-            document.getElementById('skins-container').classList.add('hidden');
-            document.getElementById('skills-container').classList.remove('hidden');
-            renderSkillsShop();
-        });
+        function openShop(tab) {
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById('shop-menu').classList.remove('hidden');
+            const shopCoins = document.getElementById('shop-coins-val');
+            if (shopCoins) shopCoins.innerText = gameState.coins.toLocaleString();
+            const body = document.querySelector('#shop-menu .shop-body');
+            if (body) body.scrollTop = 0;
+            selectShopTab(tab || 'skins');
+            setTimeout(updateAdUI, 100);
+        }
+
+        function closeShop() {
+            document.getElementById('shop-menu').classList.add('hidden');
+            document.getElementById('main-menu').classList.remove('hidden');
+            refreshHub();
+        }
+
+        // Llamada al conseguir cristales con anuncios: refresca lo que haya a la vista.
+        // (Se usaba en onAdRewarded pero no existía, así que al completar una ronda
+        // saltaba un error y en la app salía "No se pudo cargar el anuncio" aunque los
+        // cristales sí se hubieran sumado.)
+        function updateShopUI() {
+            const shopCoins = document.getElementById('shop-coins-val');
+            if (shopCoins) shopCoins.innerText = gameState.coins.toLocaleString();
+            if (!document.getElementById('shop-menu').classList.contains('hidden')) {
+                if (!document.getElementById('skins-container').classList.contains('hidden')) renderSkinsShop();
+                else renderSkillsShop();
+            }
+            refreshHub();
+        }
 
         // Registrar eventos de Botones
         document.getElementById('btn-start').addEventListener('click', startGame);
         document.getElementById('btn-restart').addEventListener('click', startGame);
         document.getElementById('btn-back-menu').addEventListener('click', goBackToMenu); 
         
-        document.getElementById('btn-shop').addEventListener('click', () => {
-            document.getElementById('main-menu').classList.add('hidden');
-            document.getElementById('shop-menu').classList.remove('hidden');
-            const shopCoins = document.getElementById('shop-coins-val');
-            if (shopCoins) shopCoins.innerText = gameState.coins;
-            // Resetear a pestaña Skins por defecto
-            document.getElementById('tab-skins').click();
+        document.getElementById('btn-shop').addEventListener('click', () => openShop('skins'));
+        document.getElementById('btn-close-shop').addEventListener('click', closeShop);
+        document.getElementById('btn-death-shop').addEventListener('click', () => { goBackToMenu(); openShop('skins'); });
+
+        // Pausa
+        document.getElementById('btn-pause').addEventListener('click', (e) => { e.currentTarget.blur(); pauseGame(); });
+        document.getElementById('btn-resume').addEventListener('click', resumeGame);
+        document.getElementById('btn-pause-restart').addEventListener('click', () => { hidePauseMenu(); isPaused = false; startGame(); });
+        document.getElementById('btn-pause-quit').addEventListener('click', () => {
+            saveData(); // los cristales recogidos se conservan
+            goBackToMenu();
         });
-        
-        document.getElementById('btn-close-shop').addEventListener('click', () => {
-            document.getElementById('shop-menu').classList.add('hidden');
-            document.getElementById('main-menu').classList.remove('hidden');
-        });
+        // Si cambias de pestaña o bloqueas el móvil en mitad de una partida, se pausa sola
+        document.addEventListener('visibilitychange', () => { if (document.hidden) pauseGame(); });
+
+        // El HUD de partida se oculta mientras se ve el hub (menú o tienda)
+        (function syncHubHud() {
+            const menu = document.getElementById('main-menu');
+            const shop = document.getElementById('shop-menu');
+            const apply = () => {
+                const inHub = !menu.classList.contains('hidden') || !shop.classList.contains('hidden');
+                document.body.classList.toggle('in-hub', inHub);
+            };
+            const mo = new MutationObserver(apply);
+            mo.observe(menu, { attributes: true, attributeFilter: ['class'] });
+            mo.observe(shop, { attributes: true, attributeFilter: ['class'] });
+            apply();
+        })();
 
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
@@ -10381,6 +11059,8 @@
 
         updateNameDisplay();
         init3D();
+        setupMenuScene();
+        refreshHub();
 
         // --- SISTEMA DE CONTROLES CONFIGURABLES ---
         const DEFAULT_CONTROLS = {
@@ -10388,6 +11068,7 @@
             moveRight:  { label: 'Moverse a la derecha',   keys: ['ArrowRight', 'd'] },
             jump:       { label: 'Saltar',                  keys: ['ArrowUp', 'w', ' '] },
             panic:      { label: 'Modo Clase (Pánico)',     keys: ['Escape', 'q'] },
+            pause:      { label: 'Pausa / Reanudar',        keys: ['p'] },
             restartX:   { label: 'Reintentar (derrota)',   keys: ['x'] },
             skillE:     { label: 'Habilidad: Inservibilidad', keys: ['e'] },
             skillF:     { label: 'Habilidad: Patas Largas',   keys: ['f'] },
@@ -10404,11 +11085,13 @@
         } catch(e) {}
         // Asegurar que todos los controles existan
         for (const id in DEFAULT_CONTROLS) {
-            if (!customControls[id]) customControls[id] = { ...DEFAULT_CONTROLS[id] };
+            if (!customControls[id] || !Array.isArray(customControls[id].keys)) customControls[id] = { ...DEFAULT_CONTROLS[id], keys: [...DEFAULT_CONTROLS[id].keys] };
         }
+        try { syncControlLabels(); } catch (e) {}
 
         function saveControls() {
             try { localStorage.setItem('altgebraica_controls', JSON.stringify(customControls)); } catch(e) {}
+            try { syncControlLabels(); } catch (e) {}
         }
 
         function getControlKeys(id) {
@@ -10416,13 +11099,15 @@
         }
 
         function formatKey(k) {
-            if (k === ' ') return 'Espacio';
+            const EN = LANG === 'en';
+            if (k === ' ') return EN ? 'Space' : 'Espacio';
             if (k === 'Escape') return 'Esc';
-            if (k === 'ArrowLeft') return '← Izq';
-            if (k === 'ArrowRight') return '→ Der';
-            if (k === 'ArrowUp') return '↑ Arr';
-            if (k === 'ArrowDown') return '↓ Aba';
-            return k.toUpperCase();
+            if (k === 'Enter') return 'Enter';
+            if (k === 'ArrowLeft') return EN ? '← Left' : '← Izq';
+            if (k === 'ArrowRight') return EN ? '→ Right' : '→ Der';
+            if (k === 'ArrowUp') return EN ? '↑ Up' : '↑ Arr';
+            if (k === 'ArrowDown') return EN ? '↓ Down' : '↓ Aba';
+            return k.length === 1 ? k.toUpperCase() : k;
         }
 
         let listeningFor = null; // { controlId, keyIndex }
@@ -10495,6 +11180,11 @@
             e.preventDefault();
             e.stopPropagation();
             const { controlId, keyIndex } = listeningFor;
+            if (e.key === 'Escape' && controlId !== 'panic') {
+                listeningFor = null;
+                renderControlsList();
+                return;
+            }
             customControls[controlId].keys[keyIndex] = e.key;
             listeningFor = null;
             saveControls();
@@ -11181,6 +11871,7 @@
 
             mpSetupRemotePlayers();
             mpInRace = true;
+            syncPauseButton();
         }
 
         function mpEndRace() {
@@ -11195,6 +11886,10 @@
             isPlaying = false;
             document.getElementById('main-menu').classList.remove('hidden');
             buildPlayerModel(); // restaura el modelo/tamaño normal del menú
+            if (playerGroup) { playerGroup.position.set(0, groundY, 0); playerGroup.rotation.set(0, 0, 0); }
+            setupMenuScene();
+            refreshHub();
+            syncPauseButton();
         }
 
         // Altura base del sprite según skin (misma tabla que usa el jugador local, para que
@@ -11576,7 +12271,7 @@
                     const li = document.createElement('li');
                     li.className = 'flex items-center justify-between bg-black/40 border border-gray-700 rounded-lg px-3 py-2';
                     li.innerHTML = `
-                        <span class="text-white text-sm font-bold">${medal} ${name}</span>
+                        <span class="text-white text-sm font-bold">${medal} ${escapeHtml(name)}</span>
                         <span class="text-gray-400 text-[10px]">${detail}</span>
                     `;
                     list.appendChild(li);
@@ -11593,6 +12288,10 @@
             document.getElementById('mp-results').classList.add('hidden');
             document.getElementById('main-menu').classList.remove('hidden');
             buildPlayerModel(); // restaura el modelo/tamaño normal del menú
+            if (playerGroup) { playerGroup.position.set(0, groundY, 0); playerGroup.rotation.set(0, 0, 0); }
+            setupMenuScene();
+            refreshHub();
+            syncPauseButton();
             mpShowLobby();
             // La carrera terminó y estamos de vuelta en la sala de espera: si sigue siendo
             // pública, vuelve a aparecer para "Aleatorio".
@@ -12212,7 +12911,10 @@
         function mpNotifySkinChange() {
             if (typeof mpRoomCode === 'undefined' || !mpRoomCode) return;
             if (mpIsHost) {
-                if (mpPlayers[mpMyId]) mpPlayers[mpMyId].skin = gameState.activeSkin;
+                if (mpPlayers[mpMyId]) {
+                    mpPlayers[mpMyId].skin = gameState.activeSkin;
+                    mpPlayers[mpMyId].name = mpMyProfile().name;
+                }
                 mpBroadcastPlayerList();
             } else if (mpConns.host) {
                 try { mpConns.host.send({ type: 'updateProfile', name: gameState.playerName, skin: gameState.activeSkin }); } catch (e) {}
@@ -12270,7 +12972,7 @@
                 li.innerHTML = `
                     <span class="text-white text-sm font-bold flex items-center gap-2">
                         ${p.isHost ? '<i class="fa-solid fa-crown text-yellow-400"></i>' : '<i class="fa-solid fa-user text-gray-400"></i>'}
-                        ${p.name}
+                        ${escapeHtml(p.name)}
                     </span>
                     <span class="text-gray-400 text-[10px]">${skinName}</span>
                 `;
